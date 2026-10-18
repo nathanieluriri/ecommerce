@@ -40,10 +40,10 @@ export function Home() {
 
   const attention = data
     ? [
-        { n: data.byStatus.paid ?? 0, to: '/orders?status=paid', label: 'paid orders to fulfil' },
-        { n: data.oversold, to: '/orders?flag=oversold', label: 'oversold orders to check' },
-        { n: data.lowStock, to: '/products?lowStock=1', label: 'products low on stock' },
-        { n: data.pendingReviews, to: '/reviews', label: 'reviews waiting for approval' },
+        { n: data.byStatus.paid ?? 0, to: '/orders?status=paid', label: ['paid order', 'to fulfil'] },
+        { n: data.oversold, to: '/orders?flag=oversold', label: ['oversold order', 'to check'] },
+        { n: data.lowStock, to: '/products?lowStock=1', label: ['product', 'low on stock'] },
+        { n: data.pendingReviews, to: '/reviews', label: ['review', 'waiting for approval'] },
       ].filter((a) => a.n > 0)
     : [];
 
@@ -107,7 +107,7 @@ export function Home() {
               <Card title="Needs attention">
                 {attention.length ? (
                   <div className="stack stack--tight">
-                    {attention.map((a) => <Link key={a.to} to={a.to}>{a.n} {a.label}</Link>)}
+                    {attention.map((a) => <Link key={a.to} to={a.to}>{a.n} {a.label[0]}{a.n === 1 ? '' : 's'} {a.label[1]}</Link>)}
                   </div>
                 ) : (
                   <span className="muted">All caught up.</span>
