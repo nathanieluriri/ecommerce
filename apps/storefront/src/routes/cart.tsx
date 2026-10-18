@@ -31,6 +31,9 @@ cart.get('/cart', async (c) => {
   const store = c.get('store');
   const { Page } = c.get('theme');
   const priced = await buildCart(c, store);
+  if (priced.problems.length) {
+    saveCart(c, new Map(priced.lines.map((l) => [lineKey(l.product._id.toHexString(), l.variant?.id), l.quantity])));
+  }
   const error = c.req.query('error');
   if (error) priced.problems.unshift(error);
   return page(

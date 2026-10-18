@@ -1,6 +1,6 @@
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { EmailMessage } from 'cloudflare:email';
-import { createMimeMessage } from 'mimetext';
+import { createMimeMessage, Mailbox } from 'mimetext';
 import PostalMime from 'postal-mime';
 import { db, ObjectId, scoped, type Collections, type DbEnv } from '@shop/core/db';
 import type { EmailService, SendEmailInput, Store } from '@shop/core';
@@ -39,7 +39,7 @@ async function deliver(env: Env, m: Outgoing) {
   msg.setSender(m.from);
   msg.setRecipient(m.to);
   msg.setSubject(m.subject);
-  if (m.replyTo) msg.setHeader('Reply-To', m.replyTo);
+  if (m.replyTo) msg.setHeader('Reply-To', new Mailbox(m.replyTo));
   for (const [k, v] of Object.entries(m.headers ?? {})) msg.setHeader(k, v);
   msg.addMessage({ contentType: 'text/plain', data: m.text || ' ' });
   msg.addMessage({ contentType: 'text/html', data: m.html });
