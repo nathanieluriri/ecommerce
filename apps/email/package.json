@@ -1,0 +1,16 @@
+{
+  "name": "@shop/email",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@shop/core": "*",
+    "mimetext": "^3.0.28",
+    "postal-mime": "^2.4.4"
+  }
+}
