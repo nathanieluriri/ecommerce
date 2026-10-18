@@ -1,6 +1,6 @@
 import { MongoClient, type Db, type Collection } from 'mongodb';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import type { Admin, Customer, EmailRecord, Order, Product, Store } from './types';
+import type { Admin, Broadcast, Category, Customer, Discount, EmailRecord, Order, Product, Review, Store, Subscriber } from './types';
 
 // Workers tie a socket to the request that opened it, so a client can't be shared across requests.
 const scope = new AsyncLocalStorage<{ client?: Promise<MongoClient> }>();
@@ -36,6 +36,12 @@ export interface Collections {
   emails: Collection<EmailRecord>;
   admins: Collection<Admin>;
   counters: Collection<{ _id: string; seq: number }>;
+  categories: Collection<Category>;
+  discounts: Collection<Discount>;
+  reviews: Collection<Review>;
+  subscribers: Collection<Subscriber>;
+  broadcasts: Collection<Broadcast>;
+  logins: Collection<{ _id: string; storeId: string; email: string; at: Date }>;
 }
 
 export async function db(env: DbEnv): Promise<Collections> {
@@ -49,6 +55,12 @@ export async function db(env: DbEnv): Promise<Collections> {
     emails: d.collection('emails'),
     admins: d.collection('admins'),
     counters: d.collection('counters'),
+    categories: d.collection('categories'),
+    discounts: d.collection('discounts'),
+    reviews: d.collection('reviews'),
+    subscribers: d.collection('subscribers'),
+    broadcasts: d.collection('broadcasts'),
+    logins: d.collection('logins'),
   };
 }
 
@@ -73,6 +85,17 @@ export async function ensureIndexes(c: Collections): Promise<void> {
     c.customers.createIndex({ storeId: 1, email: 1 }, { unique: true }),
     c.emails.createIndex({ direction: 1, createdAt: -1 }),
     c.admins.createIndex({ email: 1 }, { unique: true }),
+    c.products.createIndex({ storeId: 1, categoryIds: 1, status: 1 }),
+    c.products.createIndex({ storeId: 1, title: 'text', description: 'text', tags: 'text' }),
+    c.orders.createIndex({ storeId: 1, 'customer.email': 1, createdAt: -1 }),
+    c.categories.createIndex({ storeId: 1, slug: 1 }, { unique: true }),
+    c.discounts.createIndex({ storeId: 1, code: 1 }, { unique: true }),
+    c.reviews.createIndex({ storeId: 1, productId: 1, status: 1, createdAt: -1 }),
+    c.reviews.createIndex({ storeId: 1, status: 1, createdAt: -1 }),
+    c.subscribers.createIndex({ storeId: 1, email: 1 }, { unique: true }),
+    c.subscribers.createIndex({ token: 1 }),
+    c.broadcasts.createIndex({ status: 1 }),
+    c.logins.createIndex({ at: 1 }, { expireAfterSeconds: 3600 }),
   ]);
 }
 

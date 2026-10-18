@@ -46,6 +46,8 @@ export interface TokenPayload {
   sub: string;
   email: string;
   role: string;
+  store?: string;
+  nonce?: string;
   exp: number;
 }
 

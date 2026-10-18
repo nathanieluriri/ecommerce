@@ -11,13 +11,15 @@
     "dev:admin": "npm run dev -w @shop/admin",
     "dev:storefront": "npm run dev -w @shop/storefront",
     "deploy": "npm run deploy -w @shop/email && npm run deploy -w @shop/orders && npm run deploy -w @shop/storefront && npm run deploy -w @shop/admin",
-    "seed": "node --env-file-if-exists=.env scripts/seed.mjs"
+    "seed": "node --env-file-if-exists=.env scripts/seed.mjs",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261001.1",
     "@types/node": "^22.0.0",
     "mongodb": "^7.7.0",
     "typescript": "^5.9.3",
+    "vitest": "^4.1.12",
     "wrangler": "^4.151.1"
   }
 }
