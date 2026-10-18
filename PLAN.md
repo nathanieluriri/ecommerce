@@ -72,5 +72,5 @@ Money is always integer minor units (cents), matching Stripe.
 
 ## Known constraints
 
-- MongoDB connects over TCP with SCRAM auth; the first request in a fresh isolate pays for that handshake. The client is cached at module scope so warm requests reuse it. On the free plan's 10ms CPU limit a cold connection can exceed the budget; the Workers Paid plan ($5/month) removes that concern.
+- MongoDB connects over TCP with SCRAM auth. Workers bind a socket to the request that opened it, so each request opens its own client (`scoped()` in `packages/core/src/db.ts`) and closes it afterwards. That adds a connection handshake per request; the free plan's 10ms CPU limit can be tight on a cold isolate, and the Workers Paid plan ($5/month) removes that concern.
 - Cloudflare's `send_email` binding only delivers to verified addresses unless the account has Email Service sending enabled. The email worker falls back to Resend (free tier) when `RESEND_API_KEY` is set.
