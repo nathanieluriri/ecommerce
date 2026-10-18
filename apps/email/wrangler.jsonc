@@ -7,10 +7,14 @@
   "observability": { "enabled": true },
   // Outbound through Cloudflare. Without Email Service sending enabled this only reaches verified addresses; set RESEND_API_KEY to send anywhere.
   "send_email": [{ "name": "MAILER" }],
+  // Sends queued newsletter broadcasts in small batches.
+  "triggers": { "crons": ["*/5 * * * *"] },
   "vars": {
     "MONGODB_DB": "shop",
     "DEFAULT_FROM": "orders@example.com",
-    "FORWARD_TO": ""
+    "FORWARD_TO": "",
+    "STOREFRONT_URL": "",
+    "BROADCAST_BATCH": "40"
   }
   // Secrets: wrangler secret put MONGODB_URI, optional RESEND_API_KEY
 }
