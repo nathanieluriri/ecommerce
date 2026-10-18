@@ -23,3 +23,5 @@ export interface OrdersService {
   refund(input: { orderId: string; amount?: number; by?: string }): Promise<{ ok: true; refundId: string }>;
   addNote(input: { orderId: string; note: string; by?: string }): Promise<{ ok: true }>;
 }
+
+export type Binding<T> = Fetcher & T;

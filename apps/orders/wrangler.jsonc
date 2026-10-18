@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "shop-orders",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "services": [{ "binding": "EMAIL", "service": "shop-email" }],
+  // Cancel abandoned checkouts hourly.
+  "triggers": { "crons": ["17 * * * *"] },
+  "vars": { "MONGODB_DB": "shop", "PENDING_TTL_HOURS": "24" }
+  // Secrets: MONGODB_URI, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+  // Stripe webhook URL: https://shop-orders.<account>.workers.dev/stripe/webhook
+}
