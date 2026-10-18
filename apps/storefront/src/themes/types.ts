@@ -1,23 +1,32 @@
 import type { Child, FC } from 'hono/jsx';
-import type { Order, Product, Store } from '@shop/core';
+import type { Category, Product, Review, Store } from '@shop/core';
 
-export interface CartLine {
-  product: Product;
-  quantity: number;
-}
-
-export interface CartView {
-  lines: CartLine[];
-  subtotal: number;
-  shipping: number;
-  total: number;
+export interface PageMeta {
+  description?: string;
+  image?: string;
+  jsonLd?: unknown;
+  noindex?: boolean;
 }
 
 export interface LayoutProps {
   store: Store;
   title?: string;
+  meta?: PageMeta;
   cartCount: number;
+  categories: Category[];
+  customer: string | null;
+  notice?: string;
+  url: string;
   children: Child;
+}
+
+export interface ProductPageProps {
+  store: Store;
+  product: Product;
+  reviews: Review[];
+  canReview: boolean;
+  signedIn: boolean;
+  image: number;
 }
 
 export interface Theme {
@@ -25,9 +34,8 @@ export interface Theme {
   name: string;
   description: string;
   Layout: FC<LayoutProps>;
-  Home: FC<{ store: Store; products: Product[] }>;
-  ProductPage: FC<{ store: Store; product: Product }>;
-  Cart: FC<{ store: Store; cart: CartView; error?: string }>;
-  OrderComplete: FC<{ store: Store; order: Order }>;
-  NotFound: FC<{ store: Store }>;
+  Home: FC<{ store: Store; products: Product[]; categories: Category[] }>;
+  ProductGrid: FC<{ store: Store; products: Product[] }>;
+  ProductPage: FC<ProductPageProps>;
+  Page: FC<{ title?: string; children: Child }>;
 }

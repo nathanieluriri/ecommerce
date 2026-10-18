@@ -8,5 +8,9 @@
     "deploy": "wrangler deploy",
     "typecheck": "tsc -p ."
   },
-  "dependencies": { "@shop/core": "*", "hono": "^4.13.13" }
+  "dependencies": {
+    "@shop/core": "*",
+    "hono": "^4.13.13",
+    "zod": "^4.6.7"
+  }
 }

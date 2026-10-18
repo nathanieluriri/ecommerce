@@ -5,9 +5,14 @@
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
-  "services": [{ "binding": "ORDERS", "service": "shop-orders" }],
+  "services": [
+    { "binding": "ORDERS", "service": "shop-orders" },
+    { "binding": "EMAIL", "service": "shop-email" }
+  ],
+  // Product images uploaded from the admin. Create once: npx wrangler r2 bucket create shop-media
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "shop-media" }],
   // Every storefront domain points at this one worker. Add each as a custom domain, e.g.
   // "routes": [{ "pattern": "shop-a.com", "custom_domain": true }, { "pattern": "shop-b.com", "custom_domain": true }],
   "vars": { "MONGODB_DB": "shop", "DEFAULT_STORE": "" }
-  // Secrets: MONGODB_URI
+  // Secrets: MONGODB_URI, CUSTOMER_SECRET (any long random string, signs customer sign-in links and sessions)
 }
