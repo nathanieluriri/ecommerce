@@ -46,23 +46,34 @@ export const variantInput = z.object({
   sku: z.string().max(80).optional(),
 });
 
-export const productInput = z
-  .object({
-    slug,
-    title: z.string().min(1).max(200),
-    description: z.string().max(20000).default(''),
-    images: z.array(image).max(20).default([]),
-    price: money,
-    compareAt: money.optional(),
-    stock: z.number().int().min(0).default(0),
-    sku: z.string().max(80).optional(),
-    options: z.array(z.object({ name: z.string().min(1).max(40), values: z.array(z.string().min(1).max(60)).min(1) })).max(3).default([]),
-    variants: z.array(variantInput).max(100).default([]),
-    categoryIds: z.array(objectId).default([]),
-    status: z.enum(['draft', 'active', 'archived']).default('draft'),
-    tags: z.array(z.string()).default([]),
-  })
-  .refine((p) => p.variants.every((v) => v.options.length === p.options.length), 'Every variant needs one value per option');
+export const productFields = z.object({
+  slug,
+  title: z.string().min(1).max(200),
+  description: z.string().max(20000).default(''),
+  images: z.array(image).max(20).default([]),
+  price: money,
+  compareAt: money.optional(),
+  stock: z.number().int().min(0).default(0),
+  sku: z.string().max(80).optional(),
+  options: z.array(z.object({ name: z.string().min(1).max(40), values: z.array(z.string().min(1).max(60)).min(1) })).max(3).default([]),
+  variants: z.array(variantInput).max(100).default([]),
+  categoryIds: z.array(objectId).default([]),
+  status: z.enum(['draft', 'active', 'archived']).default('draft'),
+  tags: z.array(z.string()).default([]),
+});
+
+export function variantProblem(p: { options: { values: string[] }[]; variants: { id: string; options: string[] }[] }): string | null {
+  if (p.variants.some((v) => v.options.length !== p.options.length)) return 'Every variant needs one value per option';
+  if (p.variants.some((v) => v.options.some((value, i) => !p.options[i]!.values.includes(value)))) return 'A variant uses a value its option does not list';
+  if (new Set(p.variants.map((v) => v.id)).size !== p.variants.length) return 'Variant ids must be unique';
+  if (new Set(p.variants.map((v) => v.options.join('\u0000'))).size !== p.variants.length) return 'Two variants have the same options';
+  return null;
+}
+
+export const productInput = productFields.superRefine((p, ctx) => {
+  const problem = variantProblem(p);
+  if (problem) ctx.addIssue({ code: 'custom', message: problem, path: ['variants'] });
+});
 
 export const categoryInput = z.object({
   slug,
