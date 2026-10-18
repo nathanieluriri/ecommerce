@@ -15,6 +15,12 @@ import { Emails } from './routes/Emails';
 import { Design } from './routes/Design';
 import { Stores } from './routes/Stores';
 import { Settings } from './routes/Settings';
+import { Categories } from './routes/Categories';
+import { Discounts } from './routes/Discounts';
+import { Reviews } from './routes/Reviews';
+import { Marketing } from './routes/Marketing';
+import { CustomerDetail } from './routes/CustomerDetail';
+import { PackingSlip } from './routes/PackingSlip';
 
 const STORE_KEY = 'shop.admin.store';
 
@@ -66,6 +72,7 @@ export function App() {
     <Ctx.Provider value={ctx}>
       <BrowserRouter>
         <Routes>
+          <Route path="/orders/:id/print" element={needStore(<PackingSlip />)} />
           <Route element={<Shell />}>
             <Route path="/home" element={needStore(<Home />)} />
             <Route path="/orders" element={needStore(<Orders />)} />
@@ -73,6 +80,11 @@ export function App() {
             <Route path="/products" element={needStore(<Products />)} />
             <Route path="/products/:id" element={needStore(<ProductDetail />)} />
             <Route path="/customers" element={needStore(<Customers />)} />
+            <Route path="/customers/:id" element={needStore(<CustomerDetail />)} />
+            <Route path="/categories" element={needStore(<Categories />)} />
+            <Route path="/discounts" element={needStore(<Discounts />)} />
+            <Route path="/reviews" element={needStore(<Reviews />)} />
+            <Route path="/marketing" element={needStore(<Marketing />)} />
             <Route path="/emails" element={<Emails />} />
             <Route path="/design" element={needStore(<Design />)} />
             <Route path="/stores" element={<Stores />} />

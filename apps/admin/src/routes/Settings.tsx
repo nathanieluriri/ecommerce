@@ -31,6 +31,19 @@ export function Settings() {
     }
   }
 
+  const [pw, setPw] = useState({ current: '', next: '' });
+  const [pwMsg, setPwMsg] = useState<{ tone: 'info' | 'critical'; text: string } | null>(null);
+
+  async function changePassword() {
+    try {
+      await api('/auth/password', { body: pw });
+      setPw({ current: '', next: '' });
+      setPwMsg({ tone: 'info', text: 'Password changed.' });
+    } catch (e) {
+      setPwMsg({ tone: 'critical', text: (e as Error).message });
+    }
+  }
+
   return (
     <div className="page">
       <PageHeader title="Settings" />
@@ -42,6 +55,9 @@ export function Settings() {
               <span className="muted">{m.email}</span>
               <span className="spacer" />
               <Badge tone={m.role === 'owner' ? 'info' : 'neutral'}>{m.role}</Badge>
+              {me.role === 'owner' && m.role === 'staff' ? (
+                <Button tone="plain" onClick={async () => { if (confirm(`Remove ${m.name}?`)) { await api(`/team/${m._id}`, { method: 'DELETE' }); reload(); } }}>Remove</Button>
+              ) : null}
             </li>
           ))}
         </ul>
@@ -57,6 +73,14 @@ export function Settings() {
           <div className="row"><span className="spacer" /><Button tone="primary" busy={busy} onClick={invite}>Add member</Button></div>
         </Card>
       ) : null}
+      <Card title="Your password">
+        {pwMsg ? <Banner tone={pwMsg.tone}>{pwMsg.text}</Banner> : null}
+        <div className="cols2">
+          <Field label="Current password"><input className="input" type="password" autoComplete="current-password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} /></Field>
+          <Field label="New password" hint="At least 10 characters"><input className="input" type="password" autoComplete="new-password" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} /></Field>
+        </div>
+        <div className="row"><span className="spacer" /><Button disabled={!pw.current || pw.next.length < 10} onClick={() => void changePassword()}>Change password</Button></div>
+      </Card>
       <Card title="Payments">
         <p>Payments run through Stripe Checkout. Keys live as secrets on the orders worker (<span className="mono">STRIPE_SECRET_KEY</span>, <span className="mono">STRIPE_WEBHOOK_SECRET</span>), never in the browser.</p>
       </Card>

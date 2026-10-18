@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ExternalLink, House, LogOut, Mail, Menu as MenuIcon, Package, Palette, Settings, ShoppingBag, Store as StoreIcon, Users } from 'lucide-react';
+import { ExternalLink, FolderTree, House, LogOut, Mail, Megaphone, Menu as MenuIcon, MessageSquareQuote, Package, Palette, Settings, ShoppingBag, Store as StoreIcon, TicketPercent, Users } from 'lucide-react';
 import { useApp } from './context';
 
 const NAV = [
   { to: '/home', label: 'Home', icon: <House /> },
   { to: '/orders', label: 'Orders', icon: <ShoppingBag /> },
   { to: '/products', label: 'Products', icon: <Package /> },
+  { to: '/categories', label: 'Categories', icon: <FolderTree /> },
+  { to: '/discounts', label: 'Discounts', icon: <TicketPercent /> },
   { to: '/customers', label: 'Customers', icon: <Users /> },
+  { to: '/reviews', label: 'Reviews', icon: <MessageSquareQuote /> },
+  { to: '/marketing', label: 'Newsletter', icon: <Megaphone /> },
   { to: '/emails', label: 'Emails', icon: <Mail /> },
   { to: '/design', label: 'Storefront design', icon: <Palette /> },
 ];

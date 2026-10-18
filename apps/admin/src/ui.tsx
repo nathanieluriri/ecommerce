@@ -154,3 +154,27 @@ export function useAsync<T>(load: () => Promise<T>, deps: unknown[]) {
   const reload = useCallback(() => setTick((t) => t + 1), []);
   return { data, error, reload, setData };
 }
+
+export function Modal({ title, onClose, footer, children }: { title: string; onClose: () => void; footer?: ReactNode; children: ReactNode }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+  return (
+    <div className="modal__scrim" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal" role="dialog" aria-modal="true" aria-label={title}>
+        <div className="modal__head">
+          <h2 className="modal__title">{title}</h2>
+          <Button tone="plain" onClick={onClose} aria-label="Close">×</Button>
+        </div>
+        <div className="modal__body stack">{children}</div>
+        {footer ? <div className="modal__foot">{footer}</div> : null}
+      </div>
+    </div>
+  );
+}
+
+export function Stars({ value }: { value: number }) {
+  return <span style={{ color: '#b98900', letterSpacing: 1 }} aria-label={`${value} out of 5`}>{'★'.repeat(value)}{'☆'.repeat(5 - value)}</span>;
+}

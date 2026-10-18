@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api, qs, type Order, type OrderStatus, type Paged } from '../api';
+import { api, download, qs, type Order, type OrderStatus, type Paged } from '../api';
 import { useStore } from '../context';
 import { dateTime, money } from '../format';
-import { Empty, Loading, PageHeader, Pager, StatusBadge, Tabs, useAsync } from '../ui';
+import { Badge, Button, Empty, Loading, PageHeader, Pager, StatusBadge, Tabs, useAsync } from '../ui';
 
 const TABS: { value: '' | OrderStatus; label: string }[] = [
   { value: '', label: 'All' },
@@ -22,16 +22,21 @@ export function Orders() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const status = (params.get('status') ?? '') as '' | OrderStatus;
+  const flag = params.get('flag') ?? '';
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const { data, error } = useAsync(
-    () => api<Paged<Order>>(`/orders${qs({ storeId: store._id, status, q, page, limit: SIZE })}`),
-    [store._id, status, q, page],
+    () => api<Paged<Order>>(`/orders${qs({ storeId: store._id, status, flag, q, page, limit: SIZE })}`),
+    [store._id, status, flag, q, page],
   );
 
   return (
     <div className="page">
-      <PageHeader title="Orders" subtitle="Payments are taken by Stripe. Paid orders land here ready to fulfil." />
+      <PageHeader
+        title="Orders"
+        subtitle={flag ? 'Showing oversold orders only.' : 'Payments are taken by Stripe. Paid orders land here ready to fulfil.'}
+        actions={<Button onClick={() => void download(`/orders/export${qs({ storeId: store._id, status, flag, q })}`, `orders-${store.slug}.csv`)}>Export CSV</Button>}
+      />
       <div className="tcard">
         <Tabs value={status} options={TABS} onChange={(v) => { setPage(1); setParams(v ? { status: v } : {}); }} />
         <div className="tfilter">
@@ -63,7 +68,7 @@ export function Orders() {
                     <td className="cell--primary"><strong>#{o.number}</strong></td>
                     <td className="muted">{dateTime(o.createdAt)}</td>
                     <td>{o.customer.name || o.customer.email || <span className="muted">Guest</span>}</td>
-                    <td><StatusBadge status={o.status} /></td>
+                    <td><span className="row"><StatusBadge status={o.status} />{o.flags?.includes('oversold') ? <Badge tone="critical">Oversold</Badge> : null}{o.refundedAmount && o.status !== 'refunded' ? <Badge tone="warn">Part refunded</Badge> : null}</span></td>
                     <td className="num">{o.items.reduce((s, i) => s + i.quantity, 0)}</td>
                     <td className="cell--num num">{money(o.total, o.currency)}</td>
                   </tr>

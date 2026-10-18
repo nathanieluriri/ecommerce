@@ -15,6 +15,10 @@ interface Form {
   supportEmail: string;
   shippingFlat: string;
   freeShippingOver: string;
+  shippingCountries: string;
+  notifyEmail: string;
+  lowStockThreshold: string;
+  abandonedCartEmails: boolean;
   active: boolean;
 }
 
@@ -28,6 +32,10 @@ const toForm = (s?: Store): Form => ({
   supportEmail: s?.supportEmail ?? '',
   shippingFlat: toMajor(s?.shippingFlat ?? 0, s?.currency ?? 'usd'),
   freeShippingOver: toMajor(s?.freeShippingOver, s?.currency ?? 'usd'),
+  shippingCountries: s?.shippingCountries?.join(', ') ?? '',
+  notifyEmail: s?.notifyEmail ?? '',
+  lowStockThreshold: String(s?.lowStockThreshold ?? 5),
+  abandonedCartEmails: s?.abandonedCartEmails ?? false,
   active: s?.active ?? true,
 });
 
@@ -53,6 +61,10 @@ function StoreForm({ store, onDone }: { store?: Store; onDone: () => void }) {
       supportEmail: form.supportEmail || undefined,
       shippingFlat: toMinor(form.shippingFlat, form.currency),
       freeShippingOver: form.freeShippingOver ? toMinor(form.freeShippingOver, form.currency) : undefined,
+      shippingCountries: form.shippingCountries.split(/[\s,]+/).map((c) => c.trim().toUpperCase()).filter((c) => c.length === 2),
+      notifyEmail: form.notifyEmail || undefined,
+      lowStockThreshold: Number(form.lowStockThreshold) || 0,
+      abandonedCartEmails: form.abandonedCartEmails,
       active: form.active,
     };
     try {
@@ -84,7 +96,11 @@ function StoreForm({ store, onDone }: { store?: Store; onDone: () => void }) {
         <Field label="Support email" hint="Used as reply-to"><input className="input" type="email" value={form.supportEmail} onChange={set('supportEmail')} /></Field>
         <Field label="Flat shipping"><input className="input" inputMode="decimal" value={form.shippingFlat} onChange={set('shippingFlat')} /></Field>
         <Field label="Free shipping over" hint="Leave empty to always charge"><input className="input" inputMode="decimal" value={form.freeShippingOver} onChange={set('freeShippingOver')} /></Field>
+        <Field label="Ship to countries" hint="Two-letter codes, e.g. US, GB, NG. Empty uses a default list."><input className="input mono" value={form.shippingCountries} onChange={set('shippingCountries')} /></Field>
+        <Field label="Staff alerts go to" hint="Low-stock alerts. Defaults to the support email."><input className="input" type="email" value={form.notifyEmail} onChange={set('notifyEmail')} /></Field>
+        <Field label="Low-stock threshold"><input className="input" type="number" min={0} value={form.lowStockThreshold} onChange={set('lowStockThreshold')} /></Field>
       </div>
+      <label className="check"><input type="checkbox" checked={form.abandonedCartEmails} onChange={(e) => setForm({ ...form, abandonedCartEmails: e.target.checked })} /> Email shoppers a link back to their cart when a checkout expires</label>
       <label className="check"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Store is live</label>
       <div className="row"><span className="spacer" /><Button tone="primary" busy={busy} onClick={save}>Save store</Button></div>
     </Card>

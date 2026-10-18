@@ -49,8 +49,30 @@ export const qs = (params: Record<string, string | number | undefined>) => {
   return s ? `?${s}` : '';
 };
 
+export async function download(path: string, filename: string) {
+  const token = getToken();
+  const res = await fetch(`/api${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!res.ok) throw new ApiError(res.status, 'Export failed');
+  const url = URL.createObjectURL(await res.blob());
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function upload(file: File, storeId: string): Promise<string> {
+  const token = getToken();
+  const form = new FormData();
+  form.set('file', file);
+  form.set('storeId', storeId);
+  const res = await fetch('/api/media', { method: 'POST', body: form, headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+  if (!res.ok || !data.url) throw new ApiError(res.status, data.error ?? 'Upload failed');
+  return data.url;
+}
+
 export type OrderStatus = 'pending' | 'paid' | 'fulfilled' | 'delivered' | 'cancelled' | 'refunded';
 export type ThemeId = 'classic' | 'minimal' | 'bold';
+export type CopyTemplate = 'order_confirmation' | 'order_shipped' | 'order_status' | 'order_refunded' | 'abandoned_checkout';
 
 export interface Store {
   _id: string;
@@ -62,9 +84,23 @@ export interface Store {
   themeSettings: { accent: string; logoUrl?: string; tagline?: string; announcement?: string };
   emailFrom: string;
   supportEmail?: string;
+  notifyEmail?: string;
+  lowStockThreshold?: number;
+  abandonedCartEmails?: boolean;
+  emailCopy?: Partial<Record<CopyTemplate, { subject?: string; intro?: string }>>;
   shippingFlat: number;
   freeShippingOver?: number;
+  shippingCountries?: string[];
   active: boolean;
+}
+
+export interface Variant {
+  id: string;
+  options: string[];
+  price: number;
+  compareAt?: number;
+  stock: number;
+  sku?: string;
 }
 
 export interface Product {
@@ -77,22 +113,56 @@ export interface Product {
   price: number;
   compareAt?: number;
   stock: number;
+  sku?: string;
+  options: { name: string; values: string[] }[];
+  variants: Variant[];
+  categoryIds: string[];
   status: 'draft' | 'active' | 'archived';
   tags: string[];
+  ratingAvg?: number;
+  ratingCount?: number;
   updatedAt: string;
+}
+
+export interface Category {
+  _id: string;
+  slug: string;
+  name: string;
+  description?: string;
+  image?: string;
+  sort: number;
+  productCount?: number;
+}
+
+export interface Discount {
+  _id: string;
+  code: string;
+  type: 'percent' | 'fixed' | 'free_shipping';
+  value: number;
+  minSubtotal?: number;
+  startsAt?: string;
+  endsAt?: string;
+  usageLimit?: number;
+  usageCount: number;
+  active: boolean;
 }
 
 export interface Order {
   _id: string;
   number: number;
   status: OrderStatus;
-  items: { productId: string; title: string; image?: string; price: number; quantity: number }[];
+  items: { productId: string; variantId?: string; title: string; variantTitle?: string; sku?: string; image?: string; price: number; quantity: number }[];
   subtotal: number;
+  discount: number;
+  discountCode?: string;
   shipping: number;
   total: number;
+  refundedAmount?: number;
   currency: string;
   customer: { email?: string; name?: string; phone?: string };
   shippingAddress?: Record<string, string | undefined>;
+  fulfillment?: { carrier?: string; trackingNumber?: string; trackingUrl?: string; at: string };
+  flags?: string[];
   stripePaymentIntentId?: string;
   timeline?: { at: string; status?: OrderStatus; note: string; by?: string }[];
   createdAt: string;
@@ -105,6 +175,40 @@ export interface Customer {
   orders: number;
   totalSpent: number;
   lastOrderAt?: string;
+  lastLoginAt?: string;
+  createdAt: string;
+}
+
+export interface Review {
+  _id: string;
+  productId: string;
+  product: { _id: string; title: string; slug: string } | null;
+  email: string;
+  name: string;
+  rating: number;
+  title?: string;
+  body: string;
+  verified: boolean;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+}
+
+export interface Subscriber {
+  _id: string;
+  email: string;
+  status: 'subscribed' | 'unsubscribed';
+  createdAt: string;
+}
+
+export interface Broadcast {
+  _id: string;
+  subject: string;
+  status: 'queued' | 'sending' | 'sent';
+  sent: number;
+  failed: number;
+  createdBy?: string;
+  createdAt: string;
+  finishedAt?: string;
 }
 
 export interface Email {
@@ -127,6 +231,7 @@ export interface Me {
   name: string;
   role: 'owner' | 'staff';
   storefrontUrl: string;
+  media: boolean;
 }
 
 export interface Paged<T> {

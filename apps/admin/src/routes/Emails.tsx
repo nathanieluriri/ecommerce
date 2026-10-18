@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api, qs, type Email, type Paged } from '../api';
 import { useApp } from '../context';
+import { EmailCopy } from './EmailCopy';
 import { dateTime } from '../format';
 import { Badge, Banner, Button, Card, Empty, Field, Loading, PageHeader, Pager, Tabs, useAsync } from '../ui';
 
@@ -49,11 +50,14 @@ function Viewer({ id, onClose }: { id: string; onClose: () => void }) {
 }
 
 export function Emails() {
-  const [direction, setDirection] = useState<'in' | 'out'>('in');
+  const { store } = useApp();
+  const [tab, setTab] = useState<'in' | 'out' | 'copy'>('in');
+  const direction = tab === 'copy' ? 'in' : tab;
+  const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const [open, setOpen] = useState<string | null>(null);
   const [compose, setCompose] = useState(false);
-  const { data, reload } = useAsync(() => api<Paged<Email>>(`/emails${qs({ direction, page, limit: SIZE })}`), [direction, page]);
+  const { data, reload } = useAsync(() => api<Paged<Email> & { unread: number }>(`/emails${qs({ direction, q, page, limit: SIZE })}`), [direction, q, page]);
 
   return (
     <div className="page">
@@ -65,8 +69,11 @@ export function Emails() {
       {compose ? <Compose onSent={reload} /> : null}
       {open ? <Viewer id={open} onClose={() => { setOpen(null); reload(); }} /> : null}
       <div className="tcard">
-        <Tabs value={direction} onChange={(v) => { setPage(1); setDirection(v); }} options={[{ value: 'in', label: 'Inbox' }, { value: 'out', label: 'Sent' }]} />
-        {!data ? (
+        <Tabs value={tab} onChange={(v) => { setPage(1); setTab(v); }} options={[{ value: 'in', label: data?.unread ? `Inbox (${data.unread})` : 'Inbox' }, { value: 'out', label: 'Sent' }, ...(store ? [{ value: 'copy' as const, label: 'Email copy' }] : [])]} />
+        {tab === 'copy' ? null : <div className="tfilter"><div className="tfilter__search"><input className="input" placeholder="Search subject or address" value={q} onChange={(e) => { setPage(1); setQ(e.target.value); }} /></div></div>}
+        {tab === 'copy' ? (
+          <div className="stack" style={{ padding: 'var(--s4)' }}><EmailCopy /></div>
+        ) : !data ? (
           <Loading what="emails" />
         ) : data.items.length === 0 ? (
           <Empty title={direction === 'in' ? 'Inbox is empty' : 'Nothing sent yet'} />
@@ -87,7 +94,7 @@ export function Emails() {
             </table>
           </div>
         )}
-        {data ? <Pager page={page} total={data.total} size={SIZE} onPage={setPage} /> : null}
+        {data && tab !== 'copy' ? <Pager page={page} total={data.total} size={SIZE} onPage={setPage} /> : null}
       </div>
     </div>
   );
