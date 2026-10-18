@@ -41,10 +41,10 @@ const STATUS_COPY: Record<string, string> = {
 export function render(
   template: EmailTemplate,
   store: Store | null,
-  data: Record<string, unknown>,
+  data: { order?: Order; note?: string },
   custom: { subject?: string; html?: string; text?: string },
 ): Rendered {
-  const order = data.order as Order | undefined;
+  const order = data.order;
   switch (template) {
     case 'order_confirmation': {
       if (!order) throw new Error('order_confirmation needs data.order');

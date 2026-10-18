@@ -2,7 +2,7 @@ import { WorkerEntrypoint } from 'cloudflare:workers';
 import { EmailMessage } from 'cloudflare:email';
 import { createMimeMessage } from 'mimetext';
 import PostalMime from 'postal-mime';
-import { db, ObjectId, type DbEnv } from '@shop/core/db';
+import { db, ObjectId, scoped, type DbEnv } from '@shop/core/db';
 import type { EmailService, SendEmailInput } from '@shop/core';
 import { render } from './templates';
 
@@ -35,52 +35,57 @@ async function deliver(env: Env, from: string, to: string, subject: string, html
 
 export default class extends WorkerEntrypoint<Env> implements EmailService {
   async send(input: SendEmailInput) {
-    const c = await db(this.env);
-    const store = input.storeId ? await c.stores.findOne({ _id: new ObjectId(input.storeId) }) : null;
-    const from = store?.emailFrom || this.env.DEFAULT_FROM;
-    const r = render(input.template, store, input.data ?? {}, input);
-    const record = {
-      _id: new ObjectId(),
-      storeId: store?._id,
-      direction: 'out' as const,
-      from,
-      to: input.to,
-      subject: r.subject,
-      html: r.html,
-      text: r.text,
-      template: input.template,
-      status: 'sent' as 'sent' | 'failed',
-      error: undefined as string | undefined,
-      createdAt: new Date(),
-    };
-    try {
-      await deliver(this.env, from, input.to, r.subject, r.html, r.text, store?.supportEmail);
-    } catch (err) {
-      record.status = 'failed';
-      record.error = err instanceof Error ? err.message : String(err);
-    }
-    await c.emails.insertOne(record);
-    return { ok: record.status === 'sent', id: record._id.toHexString(), error: record.error };
+    return scoped(async () => {
+      const c = await db(this.env);
+      const store = input.storeId ? await c.stores.findOne({ _id: new ObjectId(input.storeId) }) : null;
+      const from = store?.emailFrom || this.env.DEFAULT_FROM;
+      const order = input.orderId ? await c.orders.findOne({ _id: new ObjectId(input.orderId) }) : null;
+      const r = render(input.template, store, { order: order ?? undefined, note: input.note }, input);
+      const record = {
+        _id: new ObjectId(),
+        storeId: store?._id,
+        direction: 'out' as const,
+        from,
+        to: input.to,
+        subject: r.subject,
+        html: r.html,
+        text: r.text,
+        template: input.template,
+        status: 'sent' as 'sent' | 'failed',
+        error: undefined as string | undefined,
+        createdAt: new Date(),
+      };
+      try {
+        await deliver(this.env, from, input.to, r.subject, r.html, r.text, store?.supportEmail);
+      } catch (err) {
+        record.status = 'failed';
+        record.error = err instanceof Error ? err.message : String(err);
+      }
+      await c.emails.insertOne(record, { ignoreUndefined: true });
+      return { ok: record.status === 'sent', id: record._id.toHexString(), error: record.error };
+    });
   }
 
   async email(message: ForwardableEmailMessage) {
-    const parsed = await PostalMime.parse(message.raw);
-    const c = await db(this.env);
-    const store = await c.stores.findOne({ $or: [{ emailFrom: message.to }, { supportEmail: message.to }] });
-    await c.emails.insertOne({
-      _id: new ObjectId(),
-      storeId: store?._id,
-      direction: 'in',
-      from: message.from,
-      to: message.to,
-      subject: parsed.subject ?? '(no subject)',
-      text: parsed.text,
-      html: parsed.html,
-      status: 'received',
-      read: false,
-      createdAt: new Date(),
+    return scoped(async () => {
+      const parsed = await PostalMime.parse(message.raw);
+      const c = await db(this.env);
+      const store = await c.stores.findOne({ $or: [{ emailFrom: message.to }, { supportEmail: message.to }] });
+      await c.emails.insertOne({
+        _id: new ObjectId(),
+        storeId: store?._id,
+        direction: 'in',
+        from: message.from,
+        to: message.to,
+        subject: parsed.subject ?? '(no subject)',
+        text: parsed.text,
+        html: parsed.html,
+        status: 'received',
+        read: false,
+        createdAt: new Date(),
+      }, { ignoreUndefined: true });
+      if (this.env.FORWARD_TO) await message.forward(this.env.FORWARD_TO);
     });
-    if (this.env.FORWARD_TO) await message.forward(this.env.FORWARD_TO);
   }
 
   async fetch() {

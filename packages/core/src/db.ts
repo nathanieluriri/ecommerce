@@ -1,20 +1,25 @@
 import { MongoClient, type Db, type Collection } from 'mongodb';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import type { Admin, Customer, EmailRecord, Order, Product, Store } from './types';
 
-let client: MongoClient | undefined;
-let connecting: Promise<MongoClient> | undefined;
+// Workers tie a socket to the request that opened it, so a client can't be shared across requests.
+const scope = new AsyncLocalStorage<{ client?: Promise<MongoClient> }>();
 
-// Workers reuse module state across requests in the same isolate, so one client per isolate.
-async function getClient(uri: string): Promise<MongoClient> {
-  if (client) return client;
-  connecting ??= new MongoClient(uri, { maxPoolSize: 1, minPoolSize: 0, serverSelectionTimeoutMS: 8000 })
-    .connect()
-    .then((c) => (client = c))
-    .catch((err) => {
-      connecting = undefined;
-      throw err;
-    });
-  return connecting;
+export async function scoped<T>(fn: () => Promise<T>): Promise<T> {
+  if (scope.getStore()) return fn();
+  const store: { client?: Promise<MongoClient> } = {};
+  try {
+    return await scope.run(store, fn);
+  } finally {
+    store.client?.then((c) => c.close()).catch(() => undefined);
+  }
+}
+
+function getClient(uri: string): Promise<MongoClient> {
+  const store = scope.getStore();
+  if (!store) throw new Error('db() must run inside scoped()');
+  store.client ??= new MongoClient(uri, { maxPoolSize: 1, serverSelectionTimeoutMS: 8000 }).connect();
+  return store.client;
 }
 
 export interface DbEnv {

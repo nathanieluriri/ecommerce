@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { getCookie, setCookie } from 'hono/cookie';
 import type { Binding, OrdersService, Product, Store } from '@shop/core';
-import { db, ObjectId, type DbEnv } from '@shop/core/db';
+import { db, ObjectId, scoped, type DbEnv } from '@shop/core/db';
 import { getTheme } from './themes';
 import type { CartView, Theme } from './themes/types';
 
@@ -40,6 +40,8 @@ function saveCart(c: Parameters<typeof setCookie>[0], store: Store, cart: Map<st
   const value = [...cart].filter(([, q]) => q > 0).map(([id, q]) => `${id}:${q}`).join(',');
   setCookie(c, cartCookie(store), value, { path: '/', httpOnly: true, sameSite: 'Lax', secure: true, maxAge: 60 * 60 * 24 * 30 });
 }
+
+app.use('*', (_c, next) => scoped(next));
 
 app.use('*', async (c, next) => {
   const url = new URL(c.req.url);

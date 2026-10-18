@@ -7,7 +7,8 @@ export interface SendEmailInput {
   storeId?: string;
   to: string;
   template: EmailTemplate;
-  data?: Record<string, unknown>;
+  orderId?: string;
+  note?: string;
   subject?: string;
   html?: string;
   text?: string;

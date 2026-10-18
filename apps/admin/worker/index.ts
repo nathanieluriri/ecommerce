@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { productInput, storeInput, ORDER_STATUSES, type Binding, type EmailService, type OrdersService } from '@shop/core';
-import { db, ensureIndexes, ObjectId, type DbEnv } from '@shop/core/db';
+import { db, ensureIndexes, ObjectId, scoped, type DbEnv } from '@shop/core/db';
 import { hashPassword, signToken, verifyPassword, verifyToken, type TokenPayload } from '@shop/core/auth';
 import { z } from 'zod';
 
@@ -26,7 +26,15 @@ const page = (q: Record<string, string | undefined>) => {
   return { limit, skip };
 };
 
+// .partial() still fills .default() values, which would overwrite fields the caller didn't send.
+function patch<T extends z.ZodObject>(schema: T, body: Record<string, unknown>) {
+  const parsed = schema.partial().parse(body) as Record<string, unknown>;
+  return Object.fromEntries(Object.entries(parsed).filter(([k]) => k in body)) as Partial<z.infer<T>>;
+}
+
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+app.use('*', (_c, next) => scoped(next));
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) return c.json({ error: err.message }, err.status);
@@ -100,7 +108,7 @@ app.get('/stores/:id', async (c) => {
 });
 
 app.put('/stores/:id', async (c) => {
-  const input = storeInput.partial().parse(await c.req.json());
+  const input = patch(storeInput, await c.req.json());
   const r = await (await db(c.env)).stores.findOneAndUpdate({ _id: oid(c.req.param('id')) }, { $set: input }, { returnDocument: 'after' });
   if (!r) throw new HTTPException(404, { message: 'Store not found' });
   return c.json(r);
@@ -137,7 +145,7 @@ app.get('/products/:id', async (c) => {
 });
 
 app.put('/products/:id', async (c) => {
-  const input = productInput.partial().parse(await c.req.json());
+  const input = patch(productInput, await c.req.json());
   const r = await (await db(c.env)).products.findOneAndUpdate(
     { _id: oid(c.req.param('id')) },
     { $set: { ...input, updatedAt: new Date() } },
