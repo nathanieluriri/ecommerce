@@ -8,7 +8,7 @@
   "services": [{ "binding": "EMAIL", "service": "shop-email" }],
   // Cancel abandoned checkouts hourly.
   "triggers": { "crons": ["17 * * * *"] },
-  "vars": { "MONGODB_DB": "shop", "PENDING_TTL_HOURS": "24" }
+  "vars": { "MONGODB_DB": "shop", "PENDING_TTL_HOURS": "25" }
   // Secrets: MONGODB_URI, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
   // Stripe webhook URL: https://shop-orders.<account>.workers.dev/stripe/webhook
 }
