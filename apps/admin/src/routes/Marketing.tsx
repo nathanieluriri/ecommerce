@@ -108,7 +108,7 @@ export function Marketing() {
           empty={<Empty art={<MegaphoneArt />} title="No broadcasts yet" body="Write to everyone on your list at once, for a launch, a sale or news." />}
           columns={[
             { key: 's', header: 'Subject', render: (b) => <span className="idcell__text"><span className="idcell__title">{b.subject}</span><span className="idcell__meta">{b.createdBy ? `by ${b.createdBy}` : ''}</span></span> },
-            { key: 'st', header: 'Status', render: (b) => (b.status === 'sent' ? <Badge tone="ok">Sent</Badge> : b.status === 'sending' ? <Badge tone="info">Sending</Badge> : <Badge tone="warn">Queued</Badge>) },
+            { key: 'st', header: 'Status', mobile: true, render: (b) => (b.status === 'sent' ? <Badge tone="ok">Sent</Badge> : b.status === 'sending' ? <Badge tone="info">Sending</Badge> : <Badge tone="warn">Queued</Badge>) },
             { key: 'd', header: 'Created', render: (b) => <span className="muted">{dateTime(b.createdAt)}</span> },
             { key: 'n', header: 'Delivered', numeric: true, render: (b) => <>{b.sent}{b.failed ? <span style={{ color: 'var(--critical)' }}> ({b.failed} failed)</span> : null}</> },
           ]}
@@ -126,7 +126,7 @@ export function Marketing() {
           empty={q ? <Empty title="No one matches" /> : <Empty art={<EnvelopeArt />} title={tab === 'subscribed' ? 'No subscribers yet' : 'Nobody has unsubscribed'} body={tab === 'subscribed' ? 'Shoppers join from the form in your storefront footer.' : undefined} />}
           columns={[
             { key: 'e', header: 'Email', render: (s) => <span className="idcell__title">{s.email}</span> },
-            { key: 'd', header: 'Joined', render: (s) => <span className="muted">{shortDate(s.createdAt)}</span> },
+            { key: 'd', header: 'Joined', mobile: true, render: (s) => <span className="muted">{shortDate(s.createdAt)}</span> },
           ]}
         />
       )}

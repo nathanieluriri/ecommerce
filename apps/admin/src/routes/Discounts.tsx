@@ -145,9 +145,9 @@ export function Discounts() {
         }
         columns={[
           { key: 'c', header: 'Code', render: (d) => <button type="button" className="linkbtn" onClick={() => edit(d)}><span className="idcell__text"><span className="idcell__title mono">{d.code}</span><span className="idcell__meta">{describe(d)}{d.minSubtotal ? ` over ${money(d.minSubtotal, cur)}` : ''}</span></span></button> },
-          { key: 's', header: 'Status', render: (d) => BADGE[stateOf(d)] },
+          { key: 's', header: 'Status', mobile: true, render: (d) => BADGE[stateOf(d)] },
           { key: 'w', header: 'Window', render: (d) => <span className="muted">{d.startsAt || d.endsAt ? `${d.startsAt ? shortDate(d.startsAt) : 'Now'} to ${d.endsAt ? shortDate(d.endsAt) : 'no end'}` : 'Always'}</span> },
-          { key: 'u', header: 'Used', numeric: true, render: (d) => `${d.usageCount}${d.usageLimit ? ` / ${d.usageLimit}` : ''}` },
+          { key: 'u', header: 'Used', mobile: true, numeric: true, render: (d) => `${d.usageCount}${d.usageLimit ? ` / ${d.usageLimit}` : ''}` },
         ]}
       />
       <Learn>Stripe charges the discounted total, and a code counts as used once the order is paid.</Learn>

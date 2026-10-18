@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api, type Store, type ThemeId } from '../api';
 import { useApp, useStore } from '../context';
-import { Store as StoreIcon } from 'lucide-react';
+import { ExternalLink, Monitor, Smartphone, Store as StoreIcon } from 'lucide-react';
 import { Button, Card, Field, PageHeader, useToast } from '../ui';
 
 export const THEMES: { id: ThemeId; name: string; description: string }[] = [
@@ -9,6 +9,37 @@ export const THEMES: { id: ThemeId; name: string; description: string }[] = [
   { id: 'minimal', name: 'Minimal', description: 'Editorial serif type, single-column index, lots of white space.' },
   { id: 'bold', name: 'Bold', description: 'Neo-brutalist: heavy borders, hard shadows, oversized type.' },
 ];
+
+function Preview({ url }: { url: string }) {
+  const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
+  const stage = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(900);
+  useEffect(() => {
+    const el = stage.current?.parentElement;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => entry && setWidth(entry.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const real = device === 'desktop' ? { w: 1280, h: 800 } : { w: 390, h: 760 };
+  const shown = device === 'desktop' ? width : Math.min(width, 300);
+  const scale = shown / real.w;
+  return (
+    <>
+      <div className="row">
+        <div className="segmented" aria-label="Preview size">
+          <button type="button" className="segmented__opt" aria-pressed={device === 'desktop'} onClick={() => setDevice('desktop')}><Monitor aria-hidden="true" size={14} /> Desktop</button>
+          <button type="button" className="segmented__opt" aria-pressed={device === 'mobile'} onClick={() => setDevice('mobile')}><Smartphone aria-hidden="true" size={14} /> Mobile</button>
+        </div>
+        <span className="spacer" />
+        <a className="btn btn--plain" href={url} target="_blank" rel="noreferrer"><ExternalLink aria-hidden="true" /> Open</a>
+      </div>
+      <div ref={stage} className={device === 'mobile' ? 'preview-stage preview-stage--mobile' : 'preview-stage'} style={{ width: shown, height: real.h * scale }}>
+        <iframe key={url + device} src={url} title="Storefront preview" style={{ width: real.w, height: real.h, transform: `scale(${scale})` }} />
+      </div>
+    </>
+  );
+}
 
 export function Design() {
   const { me, reloadStores } = useApp();
@@ -63,13 +94,13 @@ export function Design() {
           <Field label="Announcement bar"><input className="input" value={settings.announcement ?? ''} onChange={set('announcement')} /></Field>
         </div>
       </Card>
-      <Card title="Preview" action={previewUrl ? <a href={previewUrl} target="_blank" rel="noreferrer">Open in new tab</a> : undefined}>
+      <Card title="Preview">
         {previewUrl ? (
-          <iframe className="preview" src={previewUrl} title="Storefront preview" />
+          <Preview url={previewUrl} />
         ) : (
           <span className="muted">Set STOREFRONT_URL on the admin worker to preview here.</span>
         )}
-        <span className="muted">The preview shows the selected theme before publishing. Colours and text update after you publish.</span>
+        <span className="muted">The preview shows the theme you picked before you publish. Colours and text change after you publish.</span>
       </Card>
     </div>
   );

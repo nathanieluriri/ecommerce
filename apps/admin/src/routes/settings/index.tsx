@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, ChevronRight, CreditCard, Settings as SettingsIcon, Store as StoreIcon, Truck, UserRound, Users } from 'lucide-react';
+import { Bell, ChevronRight, CreditCard, Layers, Settings as SettingsIcon, Store as StoreIcon, Truck, UserRound, Users } from 'lucide-react';
 import { api, type Store } from '../../api';
 import { useApp, useStore } from '../../context';
 import { Card, PageHeader, SaveBar, useToast } from '../../ui';
@@ -10,7 +10,7 @@ const DOORS = [
   { to: '/settings/payments', icon: <CreditCard />, title: 'Payments', body: 'How Stripe takes payments and refunds for this store.' },
   { to: '/settings/shipping', icon: <Truck />, title: 'Shipping', body: 'Which countries you ship to and what delivery costs.' },
   { to: '/settings/notifications', icon: <Bell />, title: 'Notifications', body: 'Who hears about low stock, and whether shoppers get a nudge about their cart.' },
-  { to: '/settings/stores', icon: <SettingsIcon />, title: 'Stores', body: 'Every storefront you run from this admin, each with its own domain and design.' },
+  { to: '/settings/stores', icon: <Layers />, title: 'Stores', body: 'Every storefront you run from this admin, each with its own domain and design.' },
   { to: '/settings/team', icon: <Users />, title: 'Team', body: 'Who can sign in to the admin.' },
   { to: '/settings/account', icon: <UserRound />, title: 'Your account', body: 'Your name, email and password.' },
 ];
@@ -38,7 +38,7 @@ export function Settings() {
 
 export function SettingsPage({ icon, title, subtitle, children }: { icon: ReactNode; title: string; subtitle?: ReactNode; children: ReactNode }) {
   return (
-    <div className="page page--narrow">
+    <div className="page">
       <PageHeader icon={icon} backTo="/settings" backLabel="Settings" title={title} subtitle={subtitle} />
       {children}
     </div>

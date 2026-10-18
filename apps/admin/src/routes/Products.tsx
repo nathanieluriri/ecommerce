@@ -90,8 +90,8 @@ export function Products() {
         }
         columns={[
           { key: 'p', header: 'Product', render: (p) => <IdCell thumb={p.images[0] ?? null} title={p.title} meta={<span className="mono">/{p.slug}</span>} /> },
-          { key: 's', header: 'Status', render: (p) => productStatus(p.status) },
-          { key: 'i', header: 'Inventory', render: stockLine },
+          { key: 's', header: 'Status', mobile: true, render: (p) => productStatus(p.status) },
+          { key: 'i', header: 'Inventory', mobile: true, render: stockLine },
           { key: 'c', header: 'Category', render: (p) => <span className="muted">{p.categoryIds.map((id) => catName.get(id)).filter(Boolean).join(', ') || '-'}</span> },
           { key: 'u', header: 'Updated', render: (p) => <span className="muted">{shortDate(p.updatedAt)}</span> },
           { key: 'pr', header: 'Price', numeric: true, render: (p) => `${p.variants.some((v) => v.price !== p.price) ? 'From ' : ''}${money(p.price, store.currency)}` },

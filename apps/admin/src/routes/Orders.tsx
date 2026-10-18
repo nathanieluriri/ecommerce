@@ -79,7 +79,7 @@ export function Orders() {
           },
           { key: 'date', header: 'Date', render: (o) => shortDate(o.createdAt) },
           {
-            key: 'status',
+            key: 'status', mobile: true,
             header: 'Status',
             render: (o) => (
               <span className="row" style={{ gap: 'var(--s1)' }}>
@@ -95,7 +95,7 @@ export function Orders() {
             header: 'Destination',
             render: (o) => <span className="muted">{[o.shippingAddress?.city, o.shippingAddress?.country].filter(Boolean).join(', ') || '-'}</span>,
           },
-          { key: 'total', header: 'Total', numeric: true, render: (o) => <strong>{money(o.total, o.currency)}</strong> },
+          { key: 'total', mobile: true, header: 'Total', numeric: true, render: (o) => <strong>{money(o.total, o.currency)}</strong> },
         ]}
       />
       <Learn>Open an order to send it out, refund it, or see everything that has happened to it.</Learn>

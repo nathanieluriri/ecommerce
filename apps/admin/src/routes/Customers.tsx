@@ -39,8 +39,8 @@ export function Customers() {
           },
           { key: 'last', header: 'Last order', render: (c) => <span className="muted">{c.lastOrderAt ? shortDate(c.lastOrderAt) : '-'}</span> },
           { key: 'since', header: 'Customer since', render: (c) => <span className="muted">{shortDate(c.createdAt)}</span> },
-          { key: 'o', header: 'Orders', numeric: true, render: (c) => c.orders },
-          { key: 's', header: 'Spent', numeric: true, render: (c) => <strong>{money(c.totalSpent, store.currency)}</strong> },
+          { key: 'o', header: 'Orders', mobile: true, numeric: true, render: (c) => c.orders },
+          { key: 's', header: 'Spent', mobile: true, numeric: true, render: (c) => <strong>{money(c.totalSpent, store.currency)}</strong> },
         ]}
       />
       <Learn>Customers sign in on the storefront with a link sent to their email, no password needed.</Learn>

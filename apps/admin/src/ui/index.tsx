@@ -222,6 +222,7 @@ export interface Column<T> {
   key: string;
   header: ReactNode;
   numeric?: boolean;
+  mobile?: boolean;
   render: (row: T) => ReactNode;
 }
 
@@ -342,7 +343,14 @@ export function DataTable<T>({
                       </td>
                     ) : null}
                     {columns.map((c, j) => (
-                      <td key={c.key} className={c.numeric ? 'cell--num num' : j === 0 ? 'cell--primary' : undefined}>{c.render(row)}</td>
+                      <td
+                        key={c.key}
+                        className={j === 0 ? 'cell--primary' : c.numeric ? 'cell--num num' : undefined}
+                        data-label={j === 0 ? undefined : typeof c.header === 'string' ? c.header : ''}
+                        data-mobile={c.mobile ? 'keep' : undefined}
+                      >
+                        {c.render(row)}
+                      </td>
                     ))}
                   </tr>
                 );

@@ -85,14 +85,14 @@ export function Inventory() {
         search={{ value: q, onChange: (v) => { setPage(1); setQ(v); }, placeholder: 'Search by product or SKU' }}
         rows={rows ?? (error ? [] : null)}
         rowKey={(r) => r.key}
-        page={data ? { page, size: SIZE, total: data.total, onPage: setPage } : undefined}
+        page={data && data.total > SIZE ? { page, size: SIZE, total: data.total, onPage: setPage } : undefined}
         empty={tab === 'low' ? <Empty art={<BoxArt />} title="Nothing is running low" body="Products at or under the threshold show here." /> : <Empty art={<BoxArt />} title="No products yet" />}
         columns={[
           { key: 'p', header: 'Product', render: (r) => <Link to={`/products/${r.product._id}`} className="plainlink"><IdCell thumb={r.product.images[0] ?? null} title={r.product.title} meta={r.title || undefined} /></Link> },
           { key: 'sku', header: 'SKU', render: (r) => <span className="mono muted">{r.sku ?? '-'}</span> },
-          { key: 'state', header: 'State', render: (r) => (r.stock <= 0 ? <Badge tone="critical">Sold out</Badge> : r.stock <= threshold ? <Badge tone="warn">Low</Badge> : <Badge tone="ok">In stock</Badge>) },
+          { key: 'state', header: 'State', mobile: true, render: (r) => (r.stock <= 0 ? <Badge tone="critical">Sold out</Badge> : r.stock <= threshold ? <Badge tone="warn">Low</Badge> : <Badge tone="ok">In stock</Badge>) },
           {
-            key: 'n',
+            key: 'n', mobile: true,
             header: 'Available',
             numeric: true,
             render: (r) => (

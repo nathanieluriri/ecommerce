@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Bell, CreditCard, Plus, Store as StoreIcon, Trash2, Truck, UserRound, Users } from 'lucide-react';
+import { Bell, CreditCard, Layers, Plus, Store as StoreIcon, Trash2, Truck, UserRound, Users } from 'lucide-react';
 import { api, type Store, type ThemeId } from '../../api';
 import { useApp } from '../../context';
 import { money, slugify, toMajor, toMinor } from '../../format';
@@ -159,11 +159,11 @@ export function Stores() {
   const add = <Button tone="primary" size="lg" onClick={() => setDraft({ name: '', slug: '', currency: 'usd', theme: 'classic', emailFrom: '' })}><Plus aria-hidden="true" /> Add store</Button>;
 
   return (
-    <div className="page page--narrow">
+    <div className="page">
       <div className="page__headwrap">
         <div className="page__head">
           <div className="page__titles">
-            <h1 className="page__title">{stores.length ? <><StoreIcon aria-hidden="true" /> <span className="page__titletext">Stores</span></> : <span className="page__titletext">Create your first store</span>}</h1>
+            <h1 className="page__title">{stores.length ? <><Layers aria-hidden="true" /> <span className="page__titletext">Stores</span></> : <span className="page__titletext">Create your first store</span>}</h1>
             <p className="page__sub">Each store is a separate storefront with its own domain, currency, design and orders.</p>
           </div>
           <div className="page__actions">{stores.length ? add : null}</div>
@@ -252,7 +252,7 @@ export function Team() {
   }
 
   return (
-    <div className="page page--narrow">
+    <div className="page">
       <div className="page__headwrap">
         <div className="page__head">
           <div className="page__titles"><h1 className="page__title"><Users aria-hidden="true" /> <span className="page__titletext">Team</span></h1><p className="page__sub">Owners can do everything. Staff can do everything except manage the team.</p></div>

@@ -74,7 +74,7 @@ export function Categories() {
           { key: 'n', header: 'Category', render: (c) => <button type="button" className="linkbtn" onClick={() => setDraft({ _id: c._id, name: c.name, slug: c.slug, description: c.description ?? '', sort: String(c.sort) })}><span className="idcell__text"><span className="idcell__title">{c.name}</span><span className="idcell__meta mono">/collections/{c.slug}</span></span></button> },
           { key: 'd', header: 'Description', render: (c) => <span className="muted truncate" style={{ maxWidth: '20rem', display: 'inline-block' }}>{c.description || '-'}</span> },
           { key: 'p', header: 'Position', numeric: true, render: (c) => c.sort },
-          { key: 'c', header: 'Products', numeric: true, render: (c) => c.productCount ?? 0 },
+          { key: 'c', header: 'Products', mobile: true, numeric: true, render: (c) => c.productCount ?? 0 },
         ]}
       />
       <Learn>Add products to a category from the product page.</Learn>

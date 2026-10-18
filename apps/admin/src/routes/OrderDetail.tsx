@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Ban, Copy, MailCheck, PackageCheck, Printer, Send, ShoppingBag, Truck } from 'lucide-react';
+import { Ban, Copy, PackageCheck, Printer, RotateCcw, Send, ShoppingBag, Truck } from 'lucide-react';
 import { api, qs, type Order, type OrderStatus } from '../api';
 import { useStore } from '../context';
 import { dateTime, money, toMinor } from '../format';
@@ -54,7 +54,7 @@ function SendOutDialog({ order, onClose, onDone }: { order: Order; onClose: () =
       footer={<><Button tone="plain" onClick={onClose}>Cancel</Button><Button tone="primary" busy={busy} onClick={submit}>Mark as sent out</Button></>}
     >
       {error ? <Banner tone="critical" title="Couldn't send out the order">{error}</Banner> : null}
-      <p className="muted">All {order.items.reduce((s, i) => s + i.quantity, 0)} items in order #{order.number} go out in one parcel.</p>
+      <p className="muted">{(() => { const n = order.items.reduce((s, i) => s + i.quantity, 0); return n === 1 ? `The item in order #${order.number} goes out in one parcel.` : `All ${n} items in order #${order.number} go out in one parcel.`; })()}</p>
       <div className="cols2">
         <Field label="Carrier">
           <select className="select" value={carrier} onChange={(e) => setCarrier(e.target.value)}>
@@ -176,7 +176,7 @@ export function OrderDetail() {
           <>
             <MenuItem icon={<Printer aria-hidden="true" />} onSelect={() => { close(); window.open(`/orders/${order._id}/print`, '_blank'); }}>Print packing slip</MenuItem>
             <MenuItem icon={<Copy aria-hidden="true" />} onSelect={() => { close(); void navigator.clipboard.writeText(String(order.number)); toast.show('Order number copied'); }}>Copy order number</MenuItem>
-            {canRefund ? <MenuItem icon={<MailCheck aria-hidden="true" />} onSelect={() => { close(); setDialog('refund'); }}>Refund</MenuItem> : null}
+            {canRefund ? <MenuItem icon={<RotateCcw aria-hidden="true" />} onSelect={() => { close(); setDialog('refund'); }}>Refund</MenuItem> : null}
             {canCancel ? (
               <>
                 <MenuSeparator />

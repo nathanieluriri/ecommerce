@@ -102,11 +102,11 @@ export function Emails() {
             ),
           },
           {
-            key: 's',
+            key: 's', mobile: true,
             header: 'Status',
             render: (m) => (m.status === 'failed' ? <Badge tone="critical">Failed</Badge> : m.status === 'sent' ? <Badge tone="ok">Sent</Badge> : m.read ? <Badge>Read</Badge> : <Badge tone="info">New</Badge>),
           },
-          { key: 'd', header: 'Date', numeric: true, render: (m) => <span className="muted">{shortDate(m.createdAt)}</span> },
+          { key: 'd', header: 'Date', mobile: true, numeric: true, render: (m) => <span className="muted">{shortDate(m.createdAt)}</span> },
         ]}
       />
       <Learn>Order emails are logged here as they are sent, so you can see exactly what a customer received.</Learn>

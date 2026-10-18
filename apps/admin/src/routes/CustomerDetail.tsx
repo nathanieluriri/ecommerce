@@ -43,9 +43,9 @@ export function CustomerDetail() {
             columns={[
               { key: 'n', header: 'Order', render: (o) => <span className="idcell__title mono">#{o.number}</span> },
               { key: 'd', header: 'Date', render: (o) => shortDate(o.createdAt) },
-              { key: 's', header: 'Status', render: (o) => <StatusBadge status={o.status} /> },
+              { key: 's', header: 'Status', mobile: true, render: (o) => <StatusBadge status={o.status} /> },
               { key: 'i', header: 'Items', numeric: true, render: (o) => o.items.reduce((s, i) => s + i.quantity, 0) },
-              { key: 't', header: 'Total', numeric: true, render: (o) => <strong>{money(o.total, o.currency)}</strong> },
+              { key: 't', header: 'Total', mobile: true, numeric: true, render: (o) => <strong>{money(o.total, o.currency)}</strong> },
             ]}
           />
         </div>
