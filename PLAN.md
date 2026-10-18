@@ -74,3 +74,57 @@ Money is always integer minor units (cents), matching Stripe.
 
 - MongoDB connects over TCP with SCRAM auth. Workers bind a socket to the request that opened it, so each request opens its own client (`scoped()` in `packages/core/src/db.ts`) and closes it afterwards. That adds a connection handshake per request; the free plan's 10ms CPU limit can be tight on a cold isolate, and the Workers Paid plan ($5/month) removes that concern.
 - Cloudflare's `send_email` binding only delivers to verified addresses unless the account has Email Service sending enabled. The email worker falls back to Resend (free tier) when `RESEND_API_KEY` is set.
+
+# Phase 2: the full feature set
+
+Everything below stays on free or already-paid infrastructure: R2 (10 GB free) for images, cron triggers instead of Queues, no new paid services.
+
+## Catalogue
+- **Variants**: products get `options` (e.g. Size, Colour) and `variants` (each with its own price, compare-at price, stock and SKU). A product without variants keeps product-level price and stock.
+- **Categories** (`categories` collection), products carry `categoryIds`. Storefront category pages and nav.
+- **Images in R2**: admin uploads to a `MEDIA` bucket; both the admin and the storefront serve `/media/*` from it with immutable caching.
+- **Reviews** (`reviews` collection): customers who bought a product can review it; admin moderates; approved reviews update `ratingAvg` / `ratingCount` on the product.
+
+## Pricing and checkout
+- One pure pricing function in `@shop/core` (`priceCart`) used by both the storefront cart and the orders worker, so the price shown is the price charged.
+- **Discount codes** (`discounts` collection): percentage, fixed amount or free shipping; minimum subtotal, start/end dates, usage limit. Applied in the cart, re-validated at checkout, charged through a one-off Stripe coupon, usage counted when the order is paid.
+- Oversell protection: stock is re-checked at checkout and at payment; an order that oversells is flagged on its timeline.
+
+## Orders
+- Fulfilment with carrier, tracking number and tracking URL, included in the shipping email.
+- Partial refunds tracked as `refundedAmount`; status becomes `refunded` only when fully refunded.
+- Abandoned checkout recovery: Stripe's recovery URL is emailed when a checkout with a known email expires (per-store switch).
+- Low-stock alert email to the store's notification address when a paid order drops stock under the threshold.
+- Printable packing slip and CSV export in the admin.
+
+## Customers
+- Passwordless accounts on the storefront: magic link by email, signed session cookie, order history, order tracking page.
+- Newsletter sign-up with one-click unsubscribe; admin broadcasts to subscribers, sent in batches by the email worker's cron (stays within Workers subrequest limits without Queues).
+
+## Email
+- New templates: shipped (with tracking), abandoned checkout, low stock, magic link, broadcast.
+- Per-store copy overrides (subject and intro line) for customer-facing templates, edited in the admin.
+
+## Storefront
+- Category pages, search, variant picker (works without JavaScript), reviews with stars, discount code box, account pages, newsletter form.
+- SEO: per-page meta and Open Graph tags, Product JSON-LD, `sitemap.xml`, `robots.txt`.
+- Themes gain a shared `ProductGrid` and `Page` wrapper so new pages work in every design.
+
+## Admin
+- Categories, discounts, reviews moderation, subscribers and broadcasts, email copy, store notification settings.
+- Product editor with options/variants, category picker and R2 image uploads.
+- Order fulfilment dialog, packing slip, CSV export, refunds shown against the total.
+- Analytics: average order value, top products, refunds.
+
+## Quality
+- Vitest unit tests for pricing, discounts, auth tokens and cart parsing.
+- End-to-end run against a local MongoDB with signed Stripe test events, as in phase 1.
+
+## Steps (one commit each)
+1. Core: types, schemas, pricing, tests
+2. Email worker: new templates, copy overrides, broadcasts
+3. Orders worker: variants, discounts, fulfilment, partial refunds, recovery, low stock
+4. Storefront: theme refactor, categories, search, variants, discounts, reviews, accounts, newsletter, SEO, media
+5. Admin API
+6. Admin UI
+7. Seed, docs, end-to-end verification
