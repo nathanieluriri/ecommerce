@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "shop-storefront",
+  "main": "src/index.tsx",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "services": [{ "binding": "ORDERS", "service": "shop-orders" }],
+  // Every storefront domain points at this one worker. Add each as a custom domain, e.g.
+  // "routes": [{ "pattern": "shop-a.com", "custom_domain": true }, { "pattern": "shop-b.com", "custom_domain": true }],
+  "vars": { "MONGODB_DB": "shop", "DEFAULT_STORE": "" }
+  // Secrets: MONGODB_URI
+}
