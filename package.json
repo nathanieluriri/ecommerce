@@ -1,7 +1,10 @@
 {
   "name": "ecommerce",
   "private": true,
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
@@ -11,7 +14,8 @@
     "seed": "node --env-file-if-exists=.env scripts/seed.mjs"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20261018.0",
+    "@cloudflare/workers-types": "^5.20261001.1",
+    "@types/node": "^22.0.0",
     "typescript": "^5.9.3",
     "wrangler": "^4.151.1"
   }
