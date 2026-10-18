@@ -1,50 +1,49 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Users } from 'lucide-react';
 import { api, qs, type Customer, type Paged } from '../api';
 import { useStore } from '../context';
-import { dateTime, money } from '../format';
-import { Empty, Loading, PageHeader, Pager, Tabs, useAsync } from '../ui';
+import { money } from '../format';
+import { Banner, DataTable, Empty, Learn, PageHeader, PeopleArt, Tabs, useAsync } from '../ui';
+import { shortDate } from './Orders';
 
 const SIZE = 25;
 
 export function Customers() {
   const store = useStore();
-  const navigate = useNavigate();
   const [q, setQ] = useState('');
   const [sort, setSort] = useState<'recent' | 'spent'>('recent');
   const [page, setPage] = useState(1);
-  const { data } = useAsync(() => api<Paged<Customer>>(`/customers${qs({ storeId: store._id, q, sort, page, limit: SIZE })}`), [store._id, q, sort, page]);
+  const { data, error } = useAsync(() => api<Paged<Customer>>(`/customers${qs({ storeId: store._id, q, sort, page, limit: SIZE })}`), [store._id, q, sort, page]);
   return (
     <div className="page">
-      <PageHeader title="Customers" subtitle="Created automatically from paid orders." />
-      <div className="tcard">
-        <Tabs value={sort} onChange={(v) => { setPage(1); setSort(v); }} options={[{ value: 'recent', label: 'Recent' }, { value: 'spent', label: 'Top spenders' }]} />
-        <div className="tfilter">
-          <div className="tfilter__search"><input className="input" placeholder="Search by name or email" value={q} onChange={(e) => { setPage(1); setQ(e.target.value); }} /></div>
-        </div>
-        {!data ? (
-          <Loading what="customers" />
-        ) : data.items.length === 0 ? (
-          <Empty title="No customers yet" />
-        ) : (
-          <div className="tscroll">
-            <table className="table">
-              <thead><tr><th>Customer</th><th>Last order</th><th className="th--num">Orders</th><th className="th--num">Spent</th></tr></thead>
-              <tbody>
-                {data.items.map((c) => (
-                  <tr key={c._id} className="is-clickable" onClick={() => navigate(`/customers/${c._id}`)}>
-                    <td className="cell--primary"><span className="idcell__text"><span className="idcell__title">{c.name ?? c.email}</span><span className="idcell__meta muted">{c.email}</span></span></td>
-                    <td className="muted">{c.lastOrderAt ? dateTime(c.lastOrderAt) : ''}</td>
-                    <td className="cell--num num">{c.orders}</td>
-                    <td className="cell--num num">{money(c.totalSpent, store.currency)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {data ? <Pager page={page} total={data.total} size={SIZE} onPage={setPage} /> : null}
-      </div>
+      <PageHeader icon={<Users aria-hidden="true" />} title="Customers" />
+      {error ? <Banner tone="critical" title="Couldn't load customers">{error}</Banner> : null}
+      <DataTable<Customer>
+        tabs={<Tabs value={sort} onChange={(v) => { setPage(1); setSort(v); }} options={[{ value: 'recent', label: 'Recent' }, { value: 'spent', label: 'Top spenders' }]} />}
+        search={{ value: q, onChange: (v) => { setPage(1); setQ(v); }, placeholder: 'Search by name or email' }}
+        rows={data?.items ?? (error ? [] : null)}
+        rowKey={(c) => c._id}
+        href={(c) => `/customers/${c._id}`}
+        page={data ? { page, size: SIZE, total: data.total, onPage: setPage } : undefined}
+        empty={q ? <Empty title="No customers match" /> : <Empty art={<PeopleArt />} title="Your customers will show here" body="Everyone who pays for an order gets a customer record, with their orders and what they have spent." />}
+        columns={[
+          {
+            key: 'c',
+            header: 'Customer',
+            render: (c) => (
+              <span className="idcell">
+                <span className="avatar" aria-hidden="true">{(c.name ?? c.email).slice(0, 1).toUpperCase()}</span>
+                <span className="idcell__text"><span className="idcell__title">{c.name ?? c.email}</span><span className="idcell__meta">{c.email}</span></span>
+              </span>
+            ),
+          },
+          { key: 'last', header: 'Last order', render: (c) => <span className="muted">{c.lastOrderAt ? shortDate(c.lastOrderAt) : '-'}</span> },
+          { key: 'since', header: 'Customer since', render: (c) => <span className="muted">{shortDate(c.createdAt)}</span> },
+          { key: 'o', header: 'Orders', numeric: true, render: (c) => c.orders },
+          { key: 's', header: 'Spent', numeric: true, render: (c) => <strong>{money(c.totalSpent, store.currency)}</strong> },
+        ]}
+      />
+      <Learn>Customers sign in on the storefront with a link sent to their email, no password needed.</Learn>
     </div>
   );
 }

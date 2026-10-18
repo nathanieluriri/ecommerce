@@ -412,3 +412,6 @@ export function Modal({ title, onClose, footer, children }: { title: string; onC
 export function Stars({ value }: { value: number }) {
   return <span style={{ color: '#b98900', letterSpacing: 1 }} aria-label={`${value} out of 5`}>{'★'.repeat(value)}{'☆'.repeat(5 - value)}</span>;
 }
+export { AnalyticsBar, type Metric } from './AnalyticsBar';
+export { TagInput } from './TagInput';
+export { MediaEditor } from './Media';

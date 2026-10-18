@@ -52,11 +52,13 @@ export function storefrontBase(env: Env, store: Store): string {
 }
 
 async function sendAndLog(env: Env, c: Collections, store: Store | null, template: string, to: string, data: Parameters<typeof render>[2], kind: Parameters<typeof render>[0], headers?: Record<string, string>) {
+  const orderId = data.order?._id;
   const from = store?.emailFrom || env.DEFAULT_FROM;
   const r = render(kind, store, data);
   const record = {
     _id: new ObjectId(),
     storeId: store?._id,
+    orderId,
     direction: 'out' as const,
     from,
     to,

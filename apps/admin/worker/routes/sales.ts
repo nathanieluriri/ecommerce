@@ -62,6 +62,10 @@ sales.get('/orders/:id', async (c) => {
   return c.json(o);
 });
 
+sales.get('/orders/:id/emails', async (c) =>
+  c.json(await (await db(c.env)).emails.find({ orderId: oid(c.req.param('id')) }, { projection: { html: 0, text: 0 } }).sort({ createdAt: -1 }).toArray()),
+);
+
 sales.post('/orders/:id/status', async (c) => {
   const body = z
     .object({ status: z.enum(ORDER_STATUSES), note: z.string().max(2000).optional(), notify: z.boolean().optional(), fulfillment: fulfillmentInput.optional() })
@@ -110,6 +114,12 @@ sales.get('/customers', async (c) => {
   const d = await db(c.env);
   const [items, total] = await Promise.all([d.customers.find(filter).sort(sort).skip(skip).limit(limit).toArray(), d.customers.countDocuments(filter)]);
   return c.json({ items, total });
+});
+
+sales.get('/customers/lookup', async (c) => {
+  const email = c.req.query('email') ?? '';
+  const customer = await (await db(c.env)).customers.findOne({ storeId: oid(c.req.query('storeId')), email: { $regex: `^${escapeRegex(email)}$`, $options: 'i' } }, { projection: { _id: 1, orders: 1 } });
+  return c.json(customer);
 });
 
 sales.get('/customers/:id', async (c) => {

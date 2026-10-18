@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { api, type Store, type ThemeId } from '../api';
 import { useApp, useStore } from '../context';
-import { Banner, Button, Card, Field, PageHeader } from '../ui';
+import { Store as StoreIcon } from 'lucide-react';
+import { Button, Card, Field, PageHeader, useToast } from '../ui';
 
 export const THEMES: { id: ThemeId; name: string; description: string }[] = [
   { id: 'classic', name: 'Classic', description: 'Rounded cards, gradient hero, soft indigo. Modelled on Plaspool.' },
@@ -15,20 +16,19 @@ export function Design() {
   const [theme, setTheme] = useState<ThemeId>(store.theme);
   const [settings, setSettings] = useState<Store['themeSettings']>(store.themeSettings);
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const toast = useToast();
 
   const base = me.storefrontUrl.replace(/\/$/, '');
   const previewUrl = base ? `${base}/?store=${store.slug}&theme=${theme}` : null;
 
   async function save() {
     setBusy(true);
-    setMsg(null);
     try {
       await api(`/stores/${store._id}`, { method: 'PUT', body: { theme, themeSettings: settings } });
       await reloadStores();
-      setMsg('Published. Storefronts pick up the change within a minute.');
+      toast.show('Published. The storefront updates within a minute.');
     } catch (e) {
-      setMsg((e as Error).message);
+      toast.show((e as Error).message, 'critical');
     } finally {
       setBusy(false);
     }
@@ -38,8 +38,12 @@ export function Design() {
 
   return (
     <div className="page">
-      <PageHeader title="Storefront design" subtitle={`Each store picks its own theme. This changes ${store.name} only.`} actions={<Button tone="primary" busy={busy} onClick={save}>Publish</Button>} />
-      {msg ? <Banner>{msg}</Banner> : null}
+      <PageHeader
+        icon={<StoreIcon aria-hidden="true" />}
+        title="Online store"
+        subtitle={`Each store has its own design. This changes ${store.name} only.`}
+        actions={<Button tone="primary" size="lg" busy={busy} disabled={theme === store.theme && JSON.stringify(settings) === JSON.stringify(store.themeSettings)} onClick={save}>Publish</Button>}
+      />
       <Card title="Theme">
         <div className="themes">
           {THEMES.map((t) => (

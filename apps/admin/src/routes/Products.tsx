@@ -1,67 +1,103 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api, qs, type Paged, type Product } from '../api';
+import { useNavigate } from 'react-router-dom';
+import { FolderTree, Package, Plus } from 'lucide-react';
+import { api, qs, type Category, type Paged, type Product } from '../api';
 import { useStore } from '../context';
 import { money } from '../format';
-import { Badge, Button, Empty, Loading, PageHeader, Pager, Tabs, useAsync } from '../ui';
+import { Badge, Banner, BoxArt, Button, DataTable, Empty, IdCell, Learn, MenuItem, PageHeader, Tabs, useAsync, useToast } from '../ui';
+import { shortDate } from './Orders';
 
 const SIZE = 25;
-type Filter = '' | Product['status'] | 'low';
+type Filter = '' | Product['status'];
+
+export const productStatus = (s: Product['status']) => (
+  <Badge tone={s === 'active' ? 'ok' : s === 'draft' ? 'warn' : 'neutral'}>{s === 'active' ? 'Active' : s === 'draft' ? 'Draft' : 'Archived'}</Badge>
+);
+
+export function stockLine(p: Product) {
+  const n = p.stock;
+  const text = p.variants.length ? `${n} in stock for ${p.variants.length} variants` : `${n} in stock`;
+  return n <= 0 ? <span style={{ color: 'var(--critical)' }}>{text}</span> : n <= 5 ? <span style={{ color: 'var(--warn-ink)' }}>{text}</span> : <span>{text}</span>;
+}
 
 export function Products() {
   const store = useStore();
   const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const [status, setStatus] = useState<Filter>(params.get('lowStock') ? 'low' : '');
+  const toast = useToast();
+  const [status, setStatus] = useState<Filter>('');
+  const [category, setCategory] = useState('');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
-  const { data, error } = useAsync(() => api<Paged<Product>>(`/products${qs({ storeId: store._id, ...(status === 'low' ? { lowStock: 5 } : { status }), q, page, limit: SIZE })}`), [store._id, status, q, page]);
+  const { data, error, reload } = useAsync(
+    () => api<Paged<Product>>(`/products${qs({ storeId: store._id, status, category, q, page, limit: SIZE })}`),
+    [store._id, status, category, q, page],
+  );
+  const cats = useAsync(() => api<Category[]>(`/categories?storeId=${store._id}`), [store._id]);
+  const catName = new Map((cats.data ?? []).map((c) => [c._id, c.name]));
+
+  async function bulk(ids: string[], next: Product['status'], clear: () => void) {
+    const r = await api<{ updated: number }>('/products/bulk', { body: { ids, status: next } });
+    toast.show(`${r.updated} ${r.updated === 1 ? 'product' : 'products'} ${next === 'archived' ? 'archived' : `set to ${next}`}`);
+    clear();
+    reload();
+  }
+
+  const add = <Button tone="primary" size="lg" onClick={() => navigate('/products/new')}><Plus aria-hidden="true" /> Add product</Button>;
 
   return (
     <div className="page">
-      <PageHeader title="Products" actions={<Button tone="primary" onClick={() => navigate('/products/new')}>Add product</Button>} />
-      <div className="tcard">
-        <Tabs<Filter>
-          value={status}
-          onChange={(v) => { setPage(1); setStatus(v); }}
-          options={[{ value: '', label: 'All' }, { value: 'active', label: 'Active' }, { value: 'draft', label: 'Draft' }, { value: 'archived', label: 'Archived' }, { value: 'low', label: 'Low stock' }]}
-        />
-        <div className="tfilter">
-          <div className="tfilter__search">
-            <input className="input" placeholder="Search products" value={q} onChange={(e) => { setPage(1); setQ(e.target.value); }} />
-          </div>
-        </div>
-        {error ? <p className="field__error" style={{ padding: 'var(--s4)' }}>{error}</p> : null}
-        {!data ? (
-          <Loading what="products" />
-        ) : data.items.length === 0 ? (
-          <Empty title="No products yet" body="Add your first product and set it to Active to show it on the storefront." actions={<Button tone="primary" onClick={() => navigate('/products/new')}>Add product</Button>} />
-        ) : (
-          <div className="tscroll">
-            <table className="table">
-              <thead>
-                <tr><th>Product</th><th>Status</th><th className="th--num">Stock</th><th className="th--num">Price</th></tr>
-              </thead>
-              <tbody>
-                {data.items.map((p) => (
-                  <tr key={p._id} className="is-clickable" onClick={() => navigate(`/products/${p._id}`)}>
-                    <td className="cell--primary">
-                      <span className="idcell">
-                        {p.images[0] ? <img className="thumb" src={p.images[0]} alt="" /> : <span className="thumb" />}
-                        <span className="idcell__text"><span className="idcell__title">{p.title}</span><span className="idcell__meta muted">{p.variants.length ? `${p.variants.length} variants` : p.sku ? `SKU ${p.sku}` : p.slug}</span></span>
-                      </span>
-                    </td>
-                    <td><Badge tone={p.status === 'active' ? 'ok' : p.status === 'draft' ? 'info' : 'neutral'}>{p.status}</Badge></td>
-                    <td className="cell--num num">{p.stock <= 0 ? <Badge tone="critical">0</Badge> : p.stock}</td>
-                    <td className="cell--num num">{p.variants.length && p.variants.some((v) => v.price !== p.price) ? 'From ' : ''}{money(p.price, store.currency)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      <PageHeader
+        icon={<Package aria-hidden="true" />}
+        title="Products"
+        menu={(close) => <MenuItem icon={<FolderTree aria-hidden="true" />} onSelect={() => { close(); navigate('/products/categories'); }}>Manage categories</MenuItem>}
+        actions={add}
+      />
+      {error ? <Banner tone="critical" title="Couldn't load products">{error}</Banner> : null}
+      <DataTable<Product>
+        tabs={
+          <Tabs<Filter>
+            value={status}
+            onChange={(v) => { setPage(1); setStatus(v); }}
+            options={[{ value: '', label: 'All' }, { value: 'active', label: 'Active' }, { value: 'draft', label: 'Draft' }, { value: 'archived', label: 'Archived' }]}
+          />
+        }
+        search={{ value: q, onChange: (v) => { setPage(1); setQ(v); }, placeholder: 'Search by title or SKU' }}
+        filter={
+          cats.data?.length ? (
+            <select className="select" value={category} aria-label="Category" onChange={(e) => { setPage(1); setCategory(e.target.value); }} style={{ flex: 'none', maxWidth: '12rem' }}>
+              <option value="">All categories</option>
+              {cats.data.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
+            </select>
+          ) : undefined
+        }
+        rows={data?.items ?? (error ? [] : null)}
+        rowKey={(p) => p._id}
+        href={(p) => `/products/${p._id}`}
+        page={data ? { page, size: SIZE, total: data.total, onPage: setPage } : undefined}
+        bulk={(ids, clear) => (
+          <>
+            <Button onClick={() => void bulk(ids, 'active', clear)}>Set active</Button>
+            <Button onClick={() => void bulk(ids, 'draft', clear)}>Set draft</Button>
+            <Button tone="critical" onClick={() => void bulk(ids, 'archived', clear)}>Archive</Button>
+          </>
         )}
-        {data ? <Pager page={page} total={data.total} size={SIZE} onPage={setPage} /> : null}
-      </div>
+        empty={
+          q || status || category ? (
+            <Empty title="No products match" body="Try another tab, category or search." />
+          ) : (
+            <Empty art={<BoxArt />} title="Add your first product" body="Give it a title, a price and a photo, then set it to Active to show it on the storefront." actions={add} />
+          )
+        }
+        columns={[
+          { key: 'p', header: 'Product', render: (p) => <IdCell thumb={p.images[0] ?? null} title={p.title} meta={<span className="mono">/{p.slug}</span>} /> },
+          { key: 's', header: 'Status', render: (p) => productStatus(p.status) },
+          { key: 'i', header: 'Inventory', render: stockLine },
+          { key: 'c', header: 'Category', render: (p) => <span className="muted">{p.categoryIds.map((id) => catName.get(id)).filter(Boolean).join(', ') || '-'}</span> },
+          { key: 'u', header: 'Updated', render: (p) => <span className="muted">{shortDate(p.updatedAt)}</span> },
+          { key: 'pr', header: 'Price', numeric: true, render: (p) => `${p.variants.some((v) => v.price !== p.price) ? 'From ' : ''}${money(p.price, store.currency)}` },
+        ]}
+      />
+      <Learn>Archived products are hidden from the storefront but stay on past orders.</Learn>
     </div>
   );
 }

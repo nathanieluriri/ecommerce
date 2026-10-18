@@ -121,6 +121,7 @@ export interface Product {
   tags: string[];
   ratingAvg?: number;
   ratingCount?: number;
+  createdAt: string;
   updatedAt: string;
 }
 

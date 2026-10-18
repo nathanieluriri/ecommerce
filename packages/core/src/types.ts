@@ -206,6 +206,7 @@ export interface Broadcast {
 export interface EmailRecord {
   _id: ObjectId;
   storeId?: ObjectId;
+  orderId?: ObjectId;
   direction: 'in' | 'out';
   from: string;
   to: string;
