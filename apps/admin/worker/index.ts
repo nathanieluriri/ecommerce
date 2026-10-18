@@ -8,6 +8,7 @@ import { catalog } from './routes/catalog';
 import { sales } from './routes/sales';
 import { marketing } from './routes/marketing';
 import { stores } from './routes/stores';
+import { shell } from './routes/shell';
 
 const app = new Hono<AppEnv>().basePath('/api');
 
@@ -70,6 +71,7 @@ app.post('/auth/password', async (c) => {
   return c.json({ ok: true });
 });
 
+app.route('/', shell);
 app.route('/', stores);
 app.route('/', catalog);
 app.route('/', sales);
