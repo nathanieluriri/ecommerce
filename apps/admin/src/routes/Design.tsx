@@ -8,6 +8,7 @@ export const THEMES: { id: ThemeId; name: string; description: string }[] = [
   { id: 'classic', name: 'Classic', description: 'Rounded cards, gradient hero, soft indigo. Modelled on Plaspool.' },
   { id: 'minimal', name: 'Minimal', description: 'Editorial serif type, single-column index, lots of white space.' },
   { id: 'bold', name: 'Bold', description: 'Neo-brutalist: heavy borders, hard shadows, oversized type.' },
+  { id: 'maison', name: 'Maison', description: 'Quiet luxury: cream paper, plum, serif display type and slow, calm motion. Made for Maison de Chantal.' },
 ];
 
 function Preview({ url }: { url: string }) {

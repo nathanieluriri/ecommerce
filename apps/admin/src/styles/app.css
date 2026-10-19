@@ -92,3 +92,4 @@
 .preview-stage { position: relative; overflow: hidden; border-radius: var(--r-lg); box-shadow: var(--shadow-card); background: var(--surface-sunken); }
 .preview-stage iframe { position: absolute; top: 0; left: 0; border: 0; background: #fff; transform-origin: 0 0; }
 .preview-stage--mobile { margin: 0 auto; border-radius: 1.75rem; box-shadow: 0 0 0 8px #1a1a1a, var(--shadow-pop); }
+.theme__swatch--maison { background: radial-gradient(circle at 70% 30%, transparent 18px, #5a1028 19px, #5a1028 21px, transparent 22px), linear-gradient(90deg, #f7f2e9 50%, #3a0a1c 50%); }

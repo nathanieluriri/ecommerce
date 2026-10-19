@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const THEMES = ['classic', 'minimal', 'bold'] as const;
+export const THEMES = ['classic', 'minimal', 'bold', 'maison'] as const;
 export const ORDER_STATUSES = ['pending', 'paid', 'fulfilled', 'delivered', 'cancelled', 'refunded'] as const;
 export const COPY_TEMPLATES = ['order_confirmation', 'order_shipped', 'order_status', 'order_refunded', 'abandoned_checkout'] as const;
 

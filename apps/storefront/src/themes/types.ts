@@ -38,4 +38,5 @@ export interface Theme {
   ProductGrid: FC<{ store: Store; products: Product[] }>;
   ProductPage: FC<ProductPageProps>;
   Page: FC<{ title?: string; children: Child }>;
+  pages?: Record<string, { title: string; description?: string; render: FC<{ store: Store }> }>;
 }

@@ -5,6 +5,8 @@
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
+  // Brand images and other static files in ./public, served before the worker runs.
+  "assets": { "directory": "./public" },
   "services": [
     { "binding": "ORDERS", "service": "shop-orders" },
     { "binding": "EMAIL", "service": "shop-email" }

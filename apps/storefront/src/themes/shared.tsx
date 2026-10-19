@@ -289,7 +289,7 @@ export function Notice({ text }: { text?: string }) {
   return text ? <div class="notice" role="status">{text}</div> : null;
 }
 
-export function Head({ store, title, css, meta, url }: { store: Store; title?: string; css: string; meta?: PageMeta; url: string }) {
+export function Head({ store, title, css, meta, url, fonts }: { store: Store; title?: string; css: string; meta?: PageMeta; url: string; fonts?: string }) {
   const fullTitle = title ? `${title} | ${store.name}` : store.name;
   const description = meta?.description ?? store.themeSettings.tagline ?? store.name;
   const u = new URL(url);
@@ -309,6 +309,13 @@ export function Head({ store, title, css, meta, url }: { store: Store; title?: s
       <meta property="og:url" content={canonical} />
       {image ? <meta property="og:image" content={image} /> : null}
       <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+      {fonts ? (
+        <>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+          <link rel="stylesheet" href={fonts} />
+        </>
+      ) : null}
       {meta?.jsonLd ? <script type="application/ld+json">{raw(JSON.stringify(meta.jsonLd).replace(/</g, '\\u003c'))}</script> : null}
       <style>{raw(`:root{--accent:${/^#[0-9a-f]{3,8}$/i.test(store.themeSettings.accent) ? store.themeSettings.accent : '#2e2a6b'}}${BASE_CSS}${css}`)}</style>
     </head>

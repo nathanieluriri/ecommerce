@@ -44,6 +44,13 @@ misc.post('/unsubscribe', async (c) => {
   return c.text('Unsubscribed');
 });
 
+misc.get('/pages/:slug', (c) => {
+  const pg = c.get('theme').pages?.[c.req.param('slug')];
+  if (!pg) return c.notFound();
+  const Render = pg.render;
+  return page(c, pg.title, <Render store={c.get('store')} />, { meta: { description: pg.description } });
+});
+
 misc.get('/robots.txt', (c) => {
   const origin = new URL(c.req.url).origin;
   return c.text(`User-agent: *\nDisallow: /cart\nDisallow: /checkout\nDisallow: /account\nDisallow: /orders/\nDisallow: /search\nSitemap: ${origin}/sitemap.xml\n`);
