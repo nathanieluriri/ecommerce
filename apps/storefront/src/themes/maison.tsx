@@ -287,6 +287,7 @@ select{background:var(--paper)}
 .arch__frame img{width:100%;height:100%;object-fit:cover;transform:scale(1.06);animation:settle 3.2s var(--ease) forwards}
 .arch::before{content:'';position:absolute;inset:-18px 18px 18px -18px;border:1px solid rgba(90,16,40,.28);border-radius:999px 999px 0 0;z-index:-1}
 .js .arch--hero::before{animation:halo 2.6s var(--ease-out) .9s both}
+@keyframes drawin{from{opacity:0;transform:translateY(18px)}}
 @keyframes halo{from{opacity:0;transform:translate(18px,-18px)}}
 html.js [data-reveal=mask]{opacity:1;transform:none}
 .arch__frame,.ritual__img .zoom{transition:clip-path 2.1s var(--ease-wipe) var(--d,0ms)}
@@ -524,6 +525,9 @@ html.js [data-reveal]:not([data-reveal=clip]):not([data-reveal=wipe]).is-in{clip
   .burger[open] .drawer{display:flex}
   .drawer{position:fixed;inset:0;z-index:40;flex-direction:column;gap:6px;background:var(--paper);padding:90px var(--gutter) 40px;overflow:auto}
   .drawer a{font-family:var(--serif);font-size:36px;line-height:1.3}
+  .burger[open] .drawer a{animation:drawin 1.1s var(--ease-out) both}
+  .burger[open] .drawer a:nth-child(n+2){animation-delay:calc(var(--n,1) * 60ms)}
+  .drawer a:nth-child(3){--n:2}.drawer a:nth-child(4){--n:3}.drawer a:nth-child(5){--n:4}.drawer a:nth-child(6){--n:5}.drawer a:nth-child(7){--n:6}.drawer a:nth-child(n+8){--n:7}
   .drawer .close{position:absolute;top:28px;left:var(--gutter);font-size:11px;letter-spacing:.22em;text-transform:uppercase}
   .hdr__in{grid-template-columns:1fr auto 1fr;height:80px}
   .hero,.ritual,.pdp,.portrait{grid-template-columns:1fr}

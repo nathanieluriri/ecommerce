@@ -254,6 +254,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--a);box-s
 .join{margin-top:clamp(56px,8vw,112px)}
 .join__in{position:relative;overflow:hidden;background:var(--ink);color:#fff;border-radius:32px;padding:clamp(32px,6vw,72px);display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px;align-items:center}
 .join__in::before,.join__in::after{content:'';position:absolute;border-radius:50%;pointer-events:none}
+.join__in>*{position:relative;z-index:1}
 .join__in::before{width:340px;height:340px;right:-90px;top:-150px;background:var(--a);opacity:.9}
 .join__in::after{width:160px;height:160px;right:180px;bottom:-90px;background:var(--sun);opacity:.85}
 .join h2{font-size:clamp(2rem,4vw,3.4rem);position:relative}
@@ -322,7 +323,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--a);box-s
 .listing-bar select{min-height:44px;border-radius:999px;padding:8px 14px}
 .pager a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;background:var(--paper);color:var(--a)}
 .cart{background:var(--paper);border-radius:28px;padding:clamp(18px,3vw,36px)}
-.cart-table td{border-bottom:1px solid var(--line);padding:16px 8px}
+.cart .btn-ghost{margin-top:16px}.cart-table td{border-bottom:1px solid var(--line);padding:16px 8px}
 .cart-table a{font-weight:700}
 .cart-img img{width:80px;height:80px;border-radius:16px;background:var(--sand)}
 .cart-table input{width:72px;text-align:center;border-radius:999px}
