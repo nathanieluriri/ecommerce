@@ -317,7 +317,9 @@ export function Head({ store, title, css, meta, url, fonts }: { store: Store; ti
         </>
       ) : null}
       {meta?.jsonLd ? <script type="application/ld+json">{raw(JSON.stringify(meta.jsonLd).replace(/</g, '\\u003c'))}</script> : null}
-      <style>{raw(`:root{--accent:${/^#[0-9a-f]{3,8}$/i.test(store.themeSettings.accent) ? store.themeSettings.accent : '#2e2a6b'}}${BASE_CSS}${css}`)}</style>
+      <script>{raw(MOTION_BOOT)}</script>
+      <style>{raw(`:root{--accent:${/^#[0-9a-f]{3,8}$/i.test(store.themeSettings.accent) ? store.themeSettings.accent : '#2e2a6b'}}${BASE_CSS}${MOTION_CSS}${css}`)}</style>
+      <script>{raw(MOTION_JS)}</script>
     </head>
   );
 }
@@ -344,3 +346,60 @@ input,select,textarea,button{font:inherit;color:inherit}textarea{width:100%}
 .orders-list{list-style:none;padding:0}.orders-list li{display:flex;justify-content:space-between;gap:1rem;padding:.75rem 0;border-bottom:1px solid rgba(0,0,0,.08)}
 .cats{display:flex;gap:1rem;flex-wrap:wrap}
 @media(max-width:640px){.search{display:none}.cart-table td{padding:.5rem .25rem}}`;
+
+const MOTION_BOOT = `document.documentElement.classList.add('js');if(matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('rm')`;
+
+const MOTION_CSS = `
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s;animation-timing-function:cubic-bezier(.2,.7,.2,1)}
+::view-transition-group(hero-img){animation-duration:.5s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+.gallery-main{view-transition-name:hero-img}
+.js [data-reveal]{opacity:0;transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1),clip-path 1.1s cubic-bezier(.7,0,.2,1);transition-delay:calc(var(--i,0) * 70ms + var(--d,0ms))}
+.js [data-reveal=up]{transform:translateY(28px)}
+.js [data-reveal=down]{transform:translateY(-20px)}
+.js [data-reveal=left]{transform:translateX(-36px)}
+.js [data-reveal=right]{transform:translateX(36px)}
+.js [data-reveal=scale]{transform:scale(.94)}
+.js [data-reveal=clip]{opacity:1;clip-path:inset(100% 0 0 0)}
+.js [data-reveal=wipe]{opacity:1;clip-path:inset(0 100% 0 0)}
+.js [data-reveal].is-in{opacity:1;transform:none;clip-path:inset(0 0 0 0)}
+.split .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.split .w>span{display:inline-block;transition:transform 1s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--i,0) * 55ms + var(--d,0ms))}
+.js .split:not(.is-in) .w>span{transform:translateY(110%)}
+.marquee{overflow:hidden;display:flex;user-select:none;--gap:3rem;gap:var(--gap)}
+.marquee__track{display:flex;flex:none;gap:var(--gap);min-width:100%;justify-content:space-around;animation:marquee var(--speed,30s) linear infinite}
+.marquee:hover .marquee__track{animation-play-state:var(--hover-pause,running)}
+.marquee--rev .marquee__track{animation-direction:reverse}
+@keyframes marquee{to{transform:translateX(calc(-100% - var(--gap)))}}
+img[data-fade]{transition:opacity .6s ease}.js img[data-fade]:not(.is-loaded){opacity:0}
+@supports (animation-timeline:view()){
+  [data-parallax]{animation:parallax linear both;animation-timeline:view()}
+  @keyframes parallax{from{transform:translateY(calc(var(--p,40px) * -1))}to{transform:translateY(var(--p,40px))}}
+  [data-zoom-on-scroll]{animation:zoomin linear both;animation-timeline:view();animation-range:entry 0% cover 60%}
+  @keyframes zoomin{from{transform:scale(1.18)}to{transform:scale(1)}}
+}
+.scroll-progress{position:fixed;inset:0 0 auto;height:3px;background:var(--accent);transform-origin:0 50%;transform:scaleX(var(--sp,0));z-index:100;pointer-events:none}
+.btn.is-busy{pointer-events:none;opacity:.75}
+@media (prefers-reduced-motion:reduce){
+  @view-transition{navigation:none}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+  .js [data-reveal],.js .split .w>span{opacity:1!important;transform:none!important;clip-path:none!important}
+  [data-parallax],[data-zoom-on-scroll]{animation:none!important}
+}`;
+
+const MOTION_JS = `addEventListener("DOMContentLoaded",()=>{const d=document,rm=d.documentElement.classList.contains('rm');
+d.querySelectorAll('.split').forEach(el=>{if(el.dataset.done)return;el.dataset.done=1;let i=0;const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===3){const f=d.createDocumentFragment();c.textContent.split(/(\\s+)/).forEach(t=>{if(!t)return;if(/^\\s+$/.test(t)){f.append(t);return}const w=d.createElement('span');w.className='w';const s=d.createElement('span');s.textContent=t;s.style.setProperty('--i',i++);w.append(s);f.append(w)});c.replaceWith(f)}else if(c.nodeType===1&&c.tagName!=='BR')walk(c)})};walk(el);if(!el.hasAttribute('data-reveal'))el.setAttribute('data-split','')});
+d.querySelectorAll('[data-stagger]').forEach(p=>[...p.children].forEach((c,i)=>{c.style.setProperty('--i',i%12);if(!c.hasAttribute('data-reveal'))c.setAttribute('data-reveal',p.dataset.stagger||'up')}));
+const els=d.querySelectorAll('[data-reveal],[data-split],[data-count]');
+const count=el=>{const to=parseFloat(el.dataset.count),dec=(el.dataset.count.split('.')[1]||'').length,t0=performance.now(),dur=1400;const step=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=(to*e).toFixed(dec)+(el.dataset.suffix||'');if(k<1)requestAnimationFrame(step)};rm?el.textContent=to+(el.dataset.suffix||''):requestAnimationFrame(step)};
+if('IntersectionObserver'in window&&!rm){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-in');if(e.target.dataset.count)count(e.target);io.unobserve(e.target)}}),{rootMargin:'0px 0px -8% 0px',threshold:.08});els.forEach(e=>io.observe(e))}else els.forEach(e=>{e.classList.add('is-in');if(e.dataset.count)count(e)});
+d.querySelectorAll('img[data-fade]').forEach(i=>{if(i.complete)i.classList.add('is-loaded');else{i.addEventListener('load',()=>i.classList.add('is-loaded'));i.addEventListener('error',()=>i.classList.add('is-loaded'))}});
+const hdr=d.querySelector('[data-hide-on-scroll]'),bar=d.querySelector('.scroll-progress');let last=scrollY,tick=0;
+const onScroll=()=>{tick=0;const y=scrollY;if(hdr){hdr.classList.toggle('is-scrolled',y>12);hdr.classList.toggle('is-hidden',y>last&&y>240);}if(bar)bar.style.setProperty('--sp',y/Math.max(1,d.documentElement.scrollHeight-innerHeight));last=y};
+addEventListener('scroll',()=>{if(!tick){tick=1;requestAnimationFrame(onScroll)}},{passive:true});onScroll();
+d.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;const img=a.querySelector('[data-vt]');if(img&&!e.metaKey&&!e.ctrlKey){d.querySelectorAll('[data-vt]').forEach(x=>x.style.viewTransitionName='');img.style.viewTransitionName='hero-img'}});
+addEventListener('pageshow',()=>d.querySelectorAll('[data-vt]').forEach(x=>x.style.viewTransitionName=''));
+d.addEventListener('submit',e=>{const b=e.target.querySelector('button[type=submit],.btn');if(b)setTimeout(()=>b.classList.add('is-busy'))});
+if(!rm&&matchMedia('(hover:hover)').matches)d.querySelectorAll('[data-magnetic]').forEach(el=>{el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();el.style.transform='translate('+((e.clientX-r.left-r.width/2)*.25)+'px,'+((e.clientY-r.top-r.height/2)*.35)+'px)'});el.addEventListener('pointerleave',()=>{el.style.transform=''})});
+d.querySelectorAll('[data-tabs]').forEach(g=>g.addEventListener('click',e=>{const t=e.target.closest('[data-tab]');if(!t)return;e.preventDefault();g.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===t));g.querySelectorAll('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==t.dataset.tab)}));
+})`;
