@@ -362,7 +362,8 @@ const MOTION_CSS = `
 .js [data-reveal=scale]{transform:scale(.94)}
 .js [data-reveal=clip]{opacity:1;clip-path:inset(100% 0 0 0)}
 .js [data-reveal=wipe]{opacity:1;clip-path:inset(0 100% 0 0)}
-.js [data-reveal].is-in{opacity:1;transform:none;clip-path:inset(0 0 0 0)}
+.js [data-reveal].is-in{opacity:1;transform:none}
+.js [data-reveal=clip].is-in,.js [data-reveal=wipe].is-in{clip-path:inset(0 0 0 0)}
 .split .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
 .split .w>span{display:inline-block;transition:transform 1s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--i,0) * 55ms + var(--d,0ms))}
 .js .split:not(.is-in) .w>span{transform:translateY(110%)}
