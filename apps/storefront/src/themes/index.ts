@@ -5,9 +5,10 @@ import { minimal } from './minimal';
 import { bold } from './bold';
 import { maison } from './maison';
 import { market } from './market';
+import { paws } from './paws';
 
 // To add a design: create a theme file, register it here and add its id to THEMES in @shop/core schemas.
-export const themes: Record<Store['theme'], Theme> = { classic, minimal, bold, maison, market };
+export const themes: Record<Store['theme'], Theme> = { classic, minimal, bold, maison, market, paws };
 
 export function getTheme(id: string | undefined): Theme {
   return themes[id as Store['theme']] ?? classic;

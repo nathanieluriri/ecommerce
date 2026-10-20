@@ -1,6 +1,6 @@
 import type { ObjectId } from 'mongodb';
 
-export type ThemeId = 'classic' | 'minimal' | 'bold' | 'maison' | 'market';
+export type ThemeId = 'classic' | 'minimal' | 'bold' | 'maison' | 'market' | 'paws';
 
 export type CopyTemplate = 'order_confirmation' | 'order_shipped' | 'order_status' | 'order_refunded' | 'abandoned_checkout';
 

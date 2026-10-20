@@ -71,7 +71,7 @@ export async function upload(file: File, storeId: string): Promise<string> {
 }
 
 export type OrderStatus = 'pending' | 'paid' | 'fulfilled' | 'delivered' | 'cancelled' | 'refunded';
-export type ThemeId = 'classic' | 'minimal' | 'bold' | 'maison' | 'market';
+export type ThemeId = 'classic' | 'minimal' | 'bold' | 'maison' | 'market' | 'paws';
 export type CopyTemplate = 'order_confirmation' | 'order_shipped' | 'order_status' | 'order_refunded' | 'abandoned_checkout';
 
 export interface Store {

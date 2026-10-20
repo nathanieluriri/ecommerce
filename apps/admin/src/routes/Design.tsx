@@ -11,6 +11,7 @@ export const THEMES: { id: ThemeId; name: string; description: string }[] = [
   { id: 'bold', name: 'Bold', description: 'Neo-brutalist: heavy borders, hard shadows, oversized type.' },
   { id: 'market', name: 'Market', description: 'Bright general store: big search, product slider, category circles and product rows.' },
   { id: 'maison', name: 'Maison', description: 'Quiet luxury: cream paper, plum, serif display type and slow, calm motion. Made for Maison de Chantal.' },
+  { id: 'paws', name: 'Paws', description: 'Playful pet boutique: cream, navy and rainbow pops, rounded type, Dog / Cat switch and bouncy sticker cards. Made for CHUS PET STORE.' },
 ];
 
 function Preview({ url }: { url: string }) {

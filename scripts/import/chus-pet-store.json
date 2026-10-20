@@ -7,7 +7,7 @@
     "name": "CHUS PET STORE",
     "domains": [],
     "currency": "gbp",
-    "theme": "market",
+    "theme": "paws",
     "themeSettings": {
       "accent": "#1b3a8f",
       "logoUrl": "/chus/logo.webp",
