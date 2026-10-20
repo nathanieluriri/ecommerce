@@ -121,7 +121,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--a)}
 .hact{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;font-weight:500;font-size:14px}
 .hact:hover{background:var(--soft)}
 .hact__n{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:10px;background:var(--a);color:#fff;font-size:11px;font-weight:600;padding:0 6px}
-.cats{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:0 20px 10px;max-width:1280px;margin:0 auto}
+.cats{display:flex;flex-wrap:nowrap;min-width:0;width:100%;box-sizing:border-box;gap:4px;overflow-x:auto;scrollbar-width:none;padding:0 20px 10px;max-width:1280px;margin:0 auto}
 .cats::-webkit-scrollbar{display:none}
 .cats a{white-space:nowrap;font-size:14px;font-weight:500;color:var(--sub);padding:7px 13px;border-radius:999px}
 .cats a:hover{background:var(--soft);color:var(--ink)}
@@ -259,7 +259,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--a)}
 
 @media(max-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.features__in,.promises__in{grid-template-columns:repeat(2,1fr)}.ftr__grid{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){
-  .hdr__top{grid-template-columns:auto 1fr;height:64px;gap:12px}
+  .hdr__top{grid-template-columns:auto 1fr;height:auto;grid-template-rows:56px auto;column-gap:12px;row-gap:6px;padding-top:4px}
   .logo img{height:42px}
   .hsearch{grid-column:1/-1;grid-row:2;margin-bottom:10px}
   .hacts{justify-self:end}
