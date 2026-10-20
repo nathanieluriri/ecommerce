@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { api, type Store, type ThemeId } from '../api';
 import { useApp, useStore } from '../context';
 import { ExternalLink, Monitor, Smartphone, Store as StoreIcon } from 'lucide-react';
-import { Button, Card, Field, PageHeader, useToast } from '../ui';
+import { Button, Card, Field, PageHeader, Tabs, useToast } from '../ui';
+import { StoreContentEditor } from './StoreContent';
 
 export const THEMES: { id: ThemeId; name: string; description: string }[] = [
   { id: 'classic', name: 'Classic', description: 'Rounded cards, gradient hero, soft indigo. Modelled on Plaspool.' },
   { id: 'minimal', name: 'Minimal', description: 'Editorial serif type, single-column index, lots of white space.' },
   { id: 'bold', name: 'Bold', description: 'Neo-brutalist: heavy borders, hard shadows, oversized type.' },
+  { id: 'market', name: 'Market', description: 'Bright general store: big search, product slider, category circles and product rows.' },
   { id: 'maison', name: 'Maison', description: 'Quiet luxury: cream paper, plum, serif display type and slow, calm motion. Made for Maison de Chantal.' },
 ];
 
@@ -66,6 +68,7 @@ export function Design() {
     }
   }
 
+  const [tab, setTab] = useState<'design' | 'content'>('design');
   const set = (k: keyof Store['themeSettings']) => (e: React.ChangeEvent<HTMLInputElement>) => setSettings({ ...settings, [k]: e.target.value || undefined });
 
   return (
@@ -76,6 +79,8 @@ export function Design() {
         subtitle={`Each store has its own design. This changes ${store.name} only.`}
         actions={<Button tone="primary" size="lg" busy={busy} disabled={theme === store.theme && JSON.stringify(settings) === JSON.stringify(store.themeSettings)} onClick={save}>Publish</Button>}
       />
+      <Tabs value={tab} onChange={setTab} options={[{ value: 'design', label: 'Design' }, { value: 'content', label: 'Content' }]} />
+      {tab === 'content' ? <StoreContentEditor /> : (<>
       <Card title="Theme">
         <div className="themes">
           {THEMES.map((t) => (
@@ -103,6 +108,7 @@ export function Design() {
         )}
         <span className="muted">The preview shows the theme you picked before you publish. Colours and text change after you publish.</span>
       </Card>
+      </>)}
     </div>
   );
 }

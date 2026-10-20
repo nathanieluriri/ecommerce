@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const THEMES = ['classic', 'minimal', 'bold', 'maison'] as const;
+export const THEMES = ['classic', 'minimal', 'bold', 'maison', 'market'] as const;
 export const ORDER_STATUSES = ['pending', 'paid', 'fulfilled', 'delivered', 'cancelled', 'refunded'] as const;
 export const COPY_TEMPLATES = ['order_confirmation', 'order_shipped', 'order_status', 'order_refunded', 'abandoned_checkout'] as const;
 
@@ -31,6 +31,15 @@ export const storeInput = z.object({
   lowStockThreshold: z.number().int().min(0).max(10000).optional(),
   abandonedCartEmails: z.boolean().optional(),
   emailCopy: z.partialRecord(z.enum(COPY_TEMPLATES), copy).optional(),
+  content: z
+    .object({
+      heroTitle: z.string().max(120).optional(),
+      heroText: z.string().max(400).optional(),
+      features: z.array(z.object({ title: z.string().min(1).max(80), text: z.string().max(300) })).max(8).optional(),
+      promises: z.array(z.object({ title: z.string().min(1).max(80), text: z.string().max(300) })).max(8).optional(),
+      faq: z.array(z.object({ q: z.string().min(1).max(200), a: z.string().min(1).max(2000) })).max(20).optional(),
+    })
+    .optional(),
   shippingFlat: money.default(0),
   freeShippingOver: money.optional(),
   shippingCountries: z.array(z.string().length(2).transform((s) => s.toUpperCase())).optional(),
@@ -56,7 +65,7 @@ export const productFields = z.object({
   stock: z.number().int().min(0).default(0),
   sku: z.string().max(80).optional(),
   options: z.array(z.object({ name: z.string().min(1).max(40), values: z.array(z.string().min(1).max(60)).min(1) })).max(3).default([]),
-  variants: z.array(variantInput).max(100).default([]),
+  variants: z.array(variantInput).max(300).default([]),
   categoryIds: z.array(objectId).default([]),
   status: z.enum(['draft', 'active', 'archived']).default('draft'),
   tags: z.array(z.string()).default([]),

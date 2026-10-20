@@ -71,7 +71,7 @@ export async function upload(file: File, storeId: string): Promise<string> {
 }
 
 export type OrderStatus = 'pending' | 'paid' | 'fulfilled' | 'delivered' | 'cancelled' | 'refunded';
-export type ThemeId = 'classic' | 'minimal' | 'bold' | 'maison';
+export type ThemeId = 'classic' | 'minimal' | 'bold' | 'maison' | 'market';
 export type CopyTemplate = 'order_confirmation' | 'order_shipped' | 'order_status' | 'order_refunded' | 'abandoned_checkout';
 
 export interface Store {
@@ -88,6 +88,13 @@ export interface Store {
   lowStockThreshold?: number;
   abandonedCartEmails?: boolean;
   emailCopy?: Partial<Record<CopyTemplate, { subject?: string; intro?: string }>>;
+  content?: {
+    heroTitle?: string;
+    heroText?: string;
+    features?: { title: string; text: string }[];
+    promises?: { title: string; text: string }[];
+    faq?: { q: string; a: string }[];
+  };
   shippingFlat: number;
   freeShippingOver?: number;
   shippingCountries?: string[];

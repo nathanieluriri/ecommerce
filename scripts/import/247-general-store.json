@@ -1,0 +1,58 @@
+{
+  "csv": "247_General_Store_-_Product_List.csv",
+  "shopifyHost": "247generalstore.co.uk",
+  "categoriesFrom": "category",
+  "store": {
+    "slug": "247-general-store",
+    "name": "247 General Store",
+    "domains": [],
+    "currency": "gbp",
+    "theme": "market",
+    "themeSettings": {
+      "accent": "#1f4fd1",
+      "logoUrl": "/247/logo.webp",
+      "announcement": "Flat £4 delivery to the UK and 30+ countries",
+      "tagline": "Everyday essentials, gadgets and gifts, delivered across the UK and to 30+ countries."
+    },
+    "emailFrom": "orders@247generalstore.co.uk",
+    "supportEmail": "support@247generalstore.co.uk",
+    "shippingFlat": 400,
+    "shippingCountries": ["GB", "IE", "FR", "DE", "ES", "IT", "NL", "BE", "PT", "AT", "DK", "SE", "FI", "PL", "CZ", "GR", "HU", "RO", "LU", "SK", "SI", "HR", "LT", "LV", "EE", "US", "CA", "AU", "NZ", "NO", "CH"],
+    "lowStockThreshold": 5,
+    "abandonedCartEmails": true,
+    "content": {
+      "heroTitle": "Featured",
+      "features": [
+        { "title": "Flat £4 Delivery", "text": "£4.00 per order to the UK and 30+ countries. Most orders arrive within 2-7 days." },
+        { "title": "SSL Encrypted Payments", "text": "100% secure payments with SSL encryption." }
+      ],
+      "promises": [
+        { "title": "Friendly Customer Support", "text": "Our friendly team is here to help before, during and after your purchase." },
+        { "title": "International Delivery", "text": "We deliver across the UK and to 30+ countries, including the EU, US, Canada and Australia." },
+        { "title": "Shop with Confidence", "text": "Secure checkout, delivery options shown before you pay, and friendly support from order to doorstep." }
+      ],
+      "faq": [
+        { "q": "How long does delivery take?", "a": "<p>Most orders arrive within 2-7 days. Items are dispatched from our partner warehouses, and busy periods or customs checks can add a few days. Contact us any time for an update on your order.</p>" },
+        { "q": "Do you deliver across the UK and internationally?", "a": "<p>Yes. We deliver across the UK and to 30+ countries, including the EU, US, Canada, Australia and New Zealand. Delivery options and costs are shown at checkout.</p>" },
+        { "q": "How much does delivery cost?", "a": "<p>Delivery is a flat £4.00 per order, the same whether you buy one item or several. You will see it at checkout before you pay.</p>" },
+        { "q": "Where are products shipped from?", "a": "<p>Most items are dispatched from our partner warehouses overseas, which is why we quote 2-7 days rather than next-day delivery.</p>" },
+        { "q": "How do I place an order?", "a": "<p>Choose the product you want, add it to your basket and proceed to secure checkout. We accept Apple Pay, Google Pay and all major cards.</p>" }
+      ]
+    }
+  },
+  "categories": [
+    { "slug": "watches", "name": "Watches", "from": ["Watches"] },
+    { "slug": "tech-gadgets", "name": "Tech & Gadgets", "from": ["Tech & Gadgets"] },
+    { "slug": "pet-supplies", "name": "Pet Supplies", "from": ["Pet Supplies"] },
+    { "slug": "home-living", "name": "Home & Living", "from": ["Home & Decor", "Home & Kitchen", "Storage & Organisation"] },
+    { "slug": "beauty-personal-care", "name": "Beauty & Personal Care", "from": ["Beauty & Personal Care"] },
+    { "slug": "tools-diy-garden", "name": "Tools, DIY & Garden", "from": ["Tools & DIY", "Garden & Outdoor"] },
+    { "slug": "cleaning-bathroom", "name": "Cleaning & Bathroom", "from": ["Cleaning & Bathroom"] },
+    { "slug": "cars-travel", "name": "Cars & Travel", "from": ["Car & Travel"] },
+    { "slug": "fashion-accessories", "name": "Fashion & Accessories", "from": ["Fashion & Accessories"] },
+    { "slug": "fitness-outdoor", "name": "Fitness & Outdoor", "from": ["Fitness & Outdoor"] },
+    { "slug": "health-wellbeing", "name": "Health & Wellbeing", "from": ["Health & Wellbeing"] },
+    { "slug": "office-craft", "name": "Office & Craft", "from": ["Office & Stationery", "Craft & Hobby"] },
+    { "slug": "toys-kids", "name": "Toys & Kids", "from": ["Toys & Kids"] }
+  ]
+}

@@ -29,12 +29,21 @@ export interface ProductPageProps {
   image: number;
 }
 
+export interface HomeProps {
+  store: Store;
+  products: Product[];
+  categories: Category[];
+  featured?: Product[];
+  sections?: { category: Category; products: Product[] }[];
+}
+
 export interface Theme {
   id: Store['theme'];
   name: string;
   description: string;
   Layout: FC<LayoutProps>;
-  Home: FC<{ store: Store; products: Product[]; categories: Category[] }>;
+  Home: FC<HomeProps>;
+  homeCollections?: number;
   ProductGrid: FC<{ store: Store; products: Product[] }>;
   ProductPage: FC<ProductPageProps>;
   Page: FC<{ title?: string; children: Child }>;

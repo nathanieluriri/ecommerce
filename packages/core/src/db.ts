@@ -86,6 +86,7 @@ export async function ensureIndexes(c: Collections): Promise<void> {
     c.emails.createIndex({ direction: 1, createdAt: -1 }),
     c.admins.createIndex({ email: 1 }, { unique: true }),
     c.products.createIndex({ storeId: 1, categoryIds: 1, status: 1 }),
+    c.products.createIndex({ storeId: 1, tags: 1, status: 1 }),
     c.products.createIndex({ storeId: 1, title: 'text', description: 'text', tags: 'text' }),
     c.orders.createIndex({ storeId: 1, 'customer.email': 1, createdAt: -1 }),
     c.categories.createIndex({ storeId: 1, slug: 1 }, { unique: true }),

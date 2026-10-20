@@ -1,0 +1,58 @@
+{
+  "csv": "CHUS_PET_STORE_-_Product_List.csv",
+  "shopifyHost": "chuspetstore.co.uk",
+  "categoriesFrom": "tags",
+  "store": {
+    "slug": "chus-pet-store",
+    "name": "CHUS PET STORE",
+    "domains": [],
+    "currency": "gbp",
+    "theme": "market",
+    "themeSettings": {
+      "accent": "#1b3a8f",
+      "logoUrl": "/chus/logo.webp",
+      "announcement": "Flat £4.99 UK delivery on every order",
+      "tagline": "Hand-picked toys, beds, walking gear and grooming for dogs and cats."
+    },
+    "emailFrom": "orders@chuspetstore.co.uk",
+    "supportEmail": "support@chuspetstore.co.uk",
+    "shippingFlat": 499,
+    "shippingCountries": ["GB"],
+    "lowStockThreshold": 5,
+    "abandonedCartEmails": true,
+    "content": {
+      "heroTitle": "Pet favourites",
+      "features": [
+        { "title": "Flat £4.99 UK Delivery", "text": "£4.99 per order within the UK, shown at checkout before you pay." },
+        { "title": "SSL Encrypted Payments", "text": "100% secure payments with SSL encryption." }
+      ],
+      "promises": [
+        { "title": "Helpful Hands", "text": "Our team is here at every step, from choosing the right product to after-care support." },
+        { "title": "\"Do You Ship To\"", "text": "Probably! Our products are made and dispatched worldwide." },
+        { "title": "Love At First Sight", "text": "Every product is hand-picked and checked against real supplier data before we list it." }
+      ],
+      "faq": [
+        { "q": "How long does delivery take?", "a": "<p>Most orders arrive within 2-7 days. Items are dispatched from our partner warehouses, and busy periods or customs checks can add a few days.</p>" },
+        { "q": "Do you deliver across the UK?", "a": "<p>Yes, we deliver pet products across the UK. Delivery options, charges and estimated times are shown clearly at checkout.</p>" },
+        { "q": "How much does delivery cost?", "a": "<p>UK delivery is a flat £4.99 per order.</p>" },
+        { "q": "Where are the products shipped from?", "a": "<p>We work with several warehouses, so products ship from different locations depending on what you order.</p>" },
+        { "q": "How do I buy from your website?", "a": "<p>Choose your product, add it to your basket and check out securely. We accept Apple Pay, Google Pay and all major debit and credit cards.</p>" }
+      ]
+    }
+  },
+  "categories": [
+    { "slug": "dogs", "name": "Dogs", "from": ["Dogs"] },
+    { "slug": "cats", "name": "Cats", "from": ["Cats"] },
+    { "slug": "new-puppy", "name": "New Puppy", "from": ["New Puppy"] },
+    { "slug": "new-kitten", "name": "New Kitten", "from": ["New Kitten"] },
+    { "slug": "highly-rated", "name": "Highly Rated", "from": ["Highly Rated"] },
+    { "slug": "pet-toys", "name": "Pet Toys", "from": ["Pet Toys"] },
+    { "slug": "grooming-hygiene", "name": "Grooming & Hygiene", "from": ["Grooming & Hygiene"] },
+    { "slug": "feeding-bowls", "name": "Feeding & Bowls", "from": ["Feeding & Bowls"] },
+    { "slug": "beds-furniture", "name": "Beds & Furniture", "from": ["Beds & Furniture"] },
+    { "slug": "pet-apparel", "name": "Pet Apparel", "from": ["Pet Apparel"] },
+    { "slug": "walking-travel", "name": "Walking & Travel", "from": ["Walking & Travel"] },
+    { "slug": "collars-id", "name": "Collars & ID", "from": ["Collars & ID"] },
+    { "slug": "litter-cleanup", "name": "Litter & Cleanup", "from": ["Litter & Cleanup"] }
+  ]
+}

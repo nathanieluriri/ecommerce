@@ -42,9 +42,17 @@ async function listing(c: AppContext, opts: { title: string; description?: strin
 
 shop.get('/', async (c) => {
   const store = c.get('store');
-  const { Home } = c.get('theme');
-  const products = await (await db(c.env)).products.find({ storeId: store._id, status: 'active' }).sort({ createdAt: -1 }).limit(12).toArray();
-  return page(c, undefined, <Home store={store} products={products} categories={c.get('categories')} />, {
+  const theme = c.get('theme');
+  const { Home } = theme;
+  const d = await db(c.env);
+  const active = { storeId: store._id, status: 'active' as const };
+  const rows = theme.homeCollections ? c.get('categories').slice(0, theme.homeCollections) : [];
+  const [products, featured, sections] = await Promise.all([
+    d.products.find(active).sort({ createdAt: -1 }).limit(12).toArray(),
+    theme.homeCollections ? d.products.find({ ...active, tags: { $in: ['Featured', 'featured'] } }).sort({ updatedAt: -1 }).limit(8).toArray() : [],
+    Promise.all(rows.map(async (category) => ({ category, products: await d.products.find({ ...active, categoryIds: category._id }).sort({ ratingCount: -1, createdAt: -1 }).limit(8).toArray() }))),
+  ]);
+  return page(c, undefined, <Home store={store} products={products} categories={c.get('categories')} featured={featured} sections={sections.filter((s) => s.products.length)} />, {
     meta: { jsonLd: { '@context': 'https://schema.org', '@type': 'Organization', name: store.name, url: new URL(c.req.url).origin } },
   });
 });
