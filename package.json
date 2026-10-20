@@ -12,6 +12,7 @@
     "dev:storefront": "npm run dev -w @shop/storefront",
     "deploy": "npm run deploy -w @shop/email && npm run deploy -w @shop/orders && npm run deploy -w @shop/storefront && npm run deploy -w @shop/admin",
     "seed": "node --env-file-if-exists=.env scripts/seed.mjs",
+    "import:stores": "node --env-file-if-exists=.env scripts/import-shopify.mjs 247-general-store chus-pet-store",
     "test": "vitest run"
   },
   "devDependencies": {

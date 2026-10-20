@@ -16,6 +16,6 @@
   ],
   // Same bucket as the storefront. Create once: npx wrangler r2 bucket create shop-media
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "shop-media" }],
-  "vars": { "MONGODB_DB": "shop", "STOREFRONT_URL": "" }
+  "vars": { "MONGODB_DB": "shop", "STOREFRONT_URL": "https://shop-storefront.uririnathaniel.workers.dev" }
   // Secrets: MONGODB_URI, AUTH_SECRET (any long random string)
 }
